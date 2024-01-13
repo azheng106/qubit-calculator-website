@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>3-Qubit State Classifier</title>
+    <meta charset="UTF-8">
+    <meta name="3QubitStateClassifier"
+          content="Website that takes a 3-qubit state as input and returns its SLOCC eq class">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <h1>3-Qubit State Classifier</h1>
+    <p>Enter the 8 constants for your 3-qubit state in the boxes below.</p>
+</body>
+
+<form id="stateForm">
+    <input type="number" id="c0" required>
+    <input type="number" id="c1" required>
+    <input type="number" id="c2" required>
+    <input type="number" id="c3" required>
+    <input type="number" id="c4" required>
+    <input type="number" id="c5" required>
+    <input type="number" id="c6" required>
+    <input type="number" id="c7" required>
+    <button type="submit">Calculate</button>
+</form>
+<div id="result"></div>
+
+<script>
+    document.getElementById('stateForm').onsubmit = function(event) {
+        event.preventDefault(); // Prevent the default form behavior (reloading the page)
+        const data = {
+            c0: parseFloat(document.getElementById('c0').value),
+            c1: parseFloat(document.getElementById('c1').value),
+            c2: parseFloat(document.getElementById('c2').value),
+            c3: parseFloat(document.getElementById('c3').value),
+            c4: parseFloat(document.getElementById('c4').value),
+            c5: parseFloat(document.getElementById('c5').value),
+            c6: parseFloat(document.getElementById('c6').value),
+            c7: parseFloat(document.getElementById('c7').value),
+        };
+        fetch('/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').textContent = 'Classification: ' + data.classification;
+        });
+    };
+</script>
+</html>
