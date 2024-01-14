@@ -71,10 +71,9 @@ def eval_postfix(postfix) -> float:
     """
     Evaluate postfix expression to a single number
     """
-    queue = [item for item in postfix]  # Break up each element of postfix list
     stack = []
 
-    for token in queue:
+    for token in postfix:
         if token.isnumeric():
             stack.append(float(token))
         elif token == 'i' or token == 'j':
