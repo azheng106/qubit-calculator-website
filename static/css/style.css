@@ -1,0 +1,16 @@
+body {
+    font-family: sans-serif;
+    font-size: 16px;
+    margin: 0 0 0 30%; /* Top Right Bottom Left */
+}
+
+.input_group {
+    display: grid;
+    grid-template-columns: minmax(auto, max-content) 0.2fr;
+    align-items: center;
+    gap: 8px;
+}
+
+h1 {
+    color: darkblue;
+}

@@ -13,7 +13,7 @@ class State:
         self.c6 = c6
         self.c7 = c7
 
-    def get_3tangle(self):
+    def get_3tangle(self) -> float:
         """
         Returns the 3-tangle value of the state, which is used in determining the SLOCC eq. class
         """
@@ -22,7 +22,7 @@ class State:
         tau = 4 * abs(d)  # If dealing with complex numbers , we'll probably have to change this
         return tau
 
-    def get_state_class(self):
+    def get_state_class(self) -> Enum:
         """
         Returns the SLOCC equivalence class of the 3-qubit state, based on its tensor decomposition
         """
@@ -35,30 +35,30 @@ class State:
         # A-B-C, A-BC, and B-AC
         if eq10:
             if test1 and test2 and test3:
-                return EqClasses.A_B_C
+                return EqClass.A_B_C
 
             if not test1 and test2 and test3:
-                return EqClasses.A_BC
+                return EqClass.A_BC
 
             if test1 and not test2 and test3:
-                return EqClasses.B_AC
+                return EqClass.B_AC
 
         # C-AB
         if eq11:
             if test1 and test2 and not test3:
-                return EqClasses.C_AB
+                return EqClass.C_AB
 
         # For W and GHZ
         # Firstly, W
         if self.get_3tangle() == 0:
             if not test1 and not test2 and not test3:
-                return EqClasses.W
+                return EqClass.W
         # For GHZ
         else:
-            return EqClasses.GHZ
+            return EqClass.GHZ
 
 
-class EqClasses(Enum):
+class EqClass(Enum):
     A_B_C = 1
     A_BC = 2
     C_AB = 3

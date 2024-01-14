@@ -6,24 +6,52 @@
     <meta charset="UTF-8">
     <meta name="3QubitStateClassifier"
           content="Website that takes a 3-qubit state as input and returns its SLOCC eq class">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }}>
 </head>
 
 <body>
     <h1>3-Qubit State Classifier</h1>
-    <p>Enter the 8 constants for your 3-qubit state in the boxes below.</p>
+    <p>Enter the 8 constants for your 3-qubit state in the boxes below. <br>
+        Type "i" for <span>&#8730;</span>-1 and "sqrt" for <span>&#8730;</span>. Eg.<span>&#8730;</span>3 = sqrt(3) <br>
+        Other operations supported: + - * / ^ sin cos tan
+    </p>
 </body>
 
 <form id="stateForm">
-    <input type="number" id="c0" required>
-    <input type="number" id="c1" required>
-    <input type="number" id="c2" required>
-    <input type="number" id="c3" required>
-    <input type="number" id="c4" required>
-    <input type="number" id="c5" required>
-    <input type="number" id="c6" required>
-    <input type="number" id="c7" required>
+    <div class="input_group">
+        <label for="c0">c<sub>0</sub> |000></label>
+        <input type="text" id="c0" required>
+    </div>
+    <div class="input_group">
+        <label for="c1">c<sub>1</sub> |001></label>
+        <input type="text" id="c1" required>
+    </div>
+    <div class="input_group">
+        <label for="c2">c<sub>2</sub> |010></label>
+        <input type="text" id="c2" required>
+    </div>
+    <div class="input_group">
+        <label for="c3">c<sub>3</sub> |011></label>
+        <input type="text" id="c3" required>
+    </div>
+    <div class="input_group">
+        <label for="c4">c<sub>4</sub> |100></label>
+        <input type="text" id="c4" required>
+    </div>
+    <div class="input_group">
+        <label for="c5">c<sub>5</sub> |101></label>
+        <input type="text" id="c5" required>
+    </div>
+    <div class="input_group">
+        <label for="c6">c<sub>6</sub> |110></label>
+        <input type="text" id="c6" required>
+    </div>
+    <div class="input_group">
+        <label for="c7">c<sub>7</sub> |111></label>
+        <input type="text" id="c7" required>
+    </div>
     <button type="submit">Calculate</button>
+    <button type="reset">Reset</button>
 </form>
 <div id="result"></div>
 
@@ -31,14 +59,14 @@
     document.getElementById('stateForm').onsubmit = function(event) {
         event.preventDefault(); // Prevent the default form behavior (reloading the page)
         const data = {
-            c0: parseFloat(document.getElementById('c0').value),
-            c1: parseFloat(document.getElementById('c1').value),
-            c2: parseFloat(document.getElementById('c2').value),
-            c3: parseFloat(document.getElementById('c3').value),
-            c4: parseFloat(document.getElementById('c4').value),
-            c5: parseFloat(document.getElementById('c5').value),
-            c6: parseFloat(document.getElementById('c6').value),
-            c7: parseFloat(document.getElementById('c7').value),
+            c0: document.getElementById('c0').value,
+            c1: document.getElementById('c1').value,
+            c2: document.getElementById('c2').value,
+            c3: document.getElementById('c3').value,
+            c4: document.getElementById('c4').value,
+            c5: document.getElementById('c5').value,
+            c6: document.getElementById('c6').value,
+            c7: document.getElementById('c7').value,
         };
         fetch('/calculate', {
             method: 'POST',
