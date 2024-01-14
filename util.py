@@ -68,6 +68,9 @@ def infix_to_postfix(infix) -> list:
 
 
 def eval_postfix(postfix) -> float:
+    """
+    Evaluate postfix expression to a single number
+    """
     queue = [item for item in postfix]  # Break up each element of postfix list
     stack = []
 
