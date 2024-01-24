@@ -1,3 +1,4 @@
+import cmath
 from enum import Enum
 
 
@@ -32,7 +33,7 @@ class State:
         test1 = (self.c0 * self.c3 == self.c1 * self.c2) and (self.c5 * self.c6 == self.c4 * self.c7)
         test2 = (self.c1 * self.c4 == self.c0 * self.c5) and (self.c3 * self.c6 == self.c2 * self.c7)
         test3 = (self.c3 * self.c5 == self.c1 * self.c7) and (self.c2 * self.c4 == self.c0 * self.c6)
-        # A-B-C, A-BC, and B-AC
+
         if eq10:
             if test1 and test2 and test3:
                 return EqClass.A_B_C
@@ -43,25 +44,26 @@ class State:
             if test1 and not test2 and test3:
                 return EqClass.B_AC
 
-        # C-AB
         if eq11:
             if test1 and test2 and not test3:
                 return EqClass.C_AB
 
-        # For W and GHZ
-        # Firstly, W
         if self.get_3tangle() == 0:
             if not test1 and not test2 and not test3:
                 return EqClass.W
-        # For GHZ
         else:
             return EqClass.GHZ
 
+    def is_normal(self) -> bool:
+        x = self.c0**2
+        y = self.c7**2
+        return (self.c0 ** 2 + self.c1 ** 2 + self.c2 ** 2 + self.c3 ** 2 + self.c4 ** 2 + self.c5 ** 2 + self.c6 ** 2 + self.c7 ** 2) == 1
+
 
 class EqClass(Enum):
-    A_B_C = 1
-    A_BC = 2
-    C_AB = 3
-    B_AC = 4
-    W = 5
-    GHZ = 6
+    A_B_C = 'A-B-C'
+    A_BC = 'A-BC'
+    C_AB = 'C-AB'
+    B_AC = 'B-AC'
+    W = 'W'
+    GHZ = 'GHZ'

@@ -36,6 +36,17 @@ def stack_has_higher_precedence(stack, current_token) -> bool:
     return stack_precedence <= current_precedence
 
 
+def is_negative_sign(tokens, index):
+    """
+    Determine if the "-" is a negative number (True) or minus sign (False)
+    :param index: index of the "-"
+    :param tokens: list of tokens
+    """
+    if index == 0 or tokens[index - 1] in '*/+-^(':
+        return True
+    return False
+
+
 def infix_to_postfix(infix) -> list:
     """
     Use Shunting Yard Algorithm to translate mathematical infix to postfix
@@ -46,9 +57,17 @@ def infix_to_postfix(infix) -> list:
     tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan', infix)  # infix = '1+1' => tokens = ['1', '+', '1']
     stack = []  # Operator stack
     queue = []  # Output queue
-    for token in tokens:
-        if token.isnumeric() or token == 'i' or token == 'j':  # Numbers are automatically pushed into stack
+
+    for index, token in enumerate(tokens):
+        if token.isnumeric() or token in ['i', 'j']:  # Numbers are automatically pushed into stack
             queue.append(token)
+        elif token == '-':
+            if is_negative_sign(tokens, index):  # Treat negative sign differently
+                stack.append('unary_minus')
+            else:  # Treat like a normal operator
+                if stack and stack_has_higher_precedence(stack, token):
+                    queue.append(stack.pop())
+                stack.append(token)
         elif token == ')':  # Pop stack into queue until '(' is found, and then discard both parenthesis
             while stack and stack[-1] != '(':
                 queue.append(stack.pop())
@@ -78,10 +97,12 @@ def eval_postfix(postfix) -> float:
             stack.append(float(token))
         elif token == 'i' or token == 'j':
             stack.append(complex(0.0, 1.0))
+        elif token == 'unary_minus':
+            if len(stack) < 1:
+                raise ValueError('Invalid expression')
+            a = stack.pop()
+            stack.append(-a)
         else:
-            if len(stack) < 2:
-                raise ValueError("Invalid expression")
-
             b = stack.pop()
             if token == '+':
                 a = stack.pop()
@@ -101,7 +122,7 @@ def eval_postfix(postfix) -> float:
                 a = stack.pop()
                 result = a ** b
             elif token == 'sqrt':
-                result = math.sqrt(b)
+                result = cmath.sqrt(b)
             elif token == 'sin':
                 result = cmath.sin(b)
             elif token == 'cos':

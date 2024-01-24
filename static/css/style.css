@@ -1,4 +1,6 @@
 body {
+    transform: scale(2);
+    transform-origin: top left;
     font-family: sans-serif;
     font-size: 16px;
     margin: 0 0 0 30%; /* Top Right Bottom Left */
