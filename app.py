@@ -17,7 +17,7 @@ def calculate():
     data = request.json  # data (dictionary): {'c0': 'userinput', 'c1': 'userinput', ... , 'c7': 'userinput'}
 
     if data['coeff'] == '':  # If user left coefficient field blank, default to 1
-        data['coeff'] = 1
+        data['coeff'] = '1'
 
     # Evaluate the expressions that the user inputted
     c0 = eval_postfix(infix_to_postfix(data['c0'])) * eval_postfix(infix_to_postfix(data['coeff']))
