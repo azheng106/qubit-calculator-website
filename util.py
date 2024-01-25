@@ -5,25 +5,27 @@ from enum import Enum
 
 
 class Precedence(Enum):
-    # Lower values indicate higher precedence
-    FUNCTION = 0
-    POWER = 1
-    MULTIPLY = 2
-    ADD = 3
-    OPEN_PARENTHESIS = 99  # When comparing any operator to '(', '(' is always lower precedence
+    # Higher values indicate higher precedence
+    FUNCTION = 4
+    UNARY_MINUS = 3
+    POWER = 2
+    MULTIPLY = 1
+    ADD = 0
+    OPEN_PARENTHESIS = -99  # When comparing any operator to '(', '(' is always lower precedence
 
 
 precedences = {
-    '(': Precedence.OPEN_PARENTHESIS.value,
     'sin': Precedence.FUNCTION.value,
     'cos': Precedence.FUNCTION.value,
     'tan': Precedence.FUNCTION.value,
     'sqrt': Precedence.FUNCTION.value,
+    'unary_minus': Precedence.UNARY_MINUS.value,
     '^': Precedence.POWER.value,
     '*': Precedence.MULTIPLY.value,
     '/': Precedence.MULTIPLY.value,
     '+': Precedence.ADD.value,
     '-': Precedence.ADD.value,
+    '(': Precedence.OPEN_PARENTHESIS.value,
 }
 
 
@@ -33,16 +35,25 @@ def stack_has_higher_precedence(stack, current_token) -> bool:
     """
     stack_precedence = precedences.get(stack[-1], float('inf'))
     current_precedence = precedences.get(current_token, float('inf'))
-    return stack_precedence <= current_precedence
+    return stack_precedence >= current_precedence
 
 
-def is_negative_sign(tokens, index):
+def is_negative_sign(tokens, index) -> bool:
     """
     Determine if the "-" is a negative number (True) or minus sign (False)
     :param index: index of the "-"
     :param tokens: list of tokens
     """
     if index == 0 or tokens[index - 1] in '*/+-^(':
+        return True
+    return False
+
+
+def is_float(token) -> bool:
+    """
+    Check if the input token is a float/int because isnumeric() only works for ints
+    """
+    if token.replace('.', '').isnumeric():
         return True
     return False
 
@@ -54,12 +65,21 @@ def infix_to_postfix(infix) -> list:
     :param infix: Input mathematical expression
     :return: Postfix
     """
-    tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan', infix)  # infix = '1+1' => tokens = ['1', '+', '1']
+    infix = infix.replace(' ', '')  # Remove spaces
+    tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan|pi', infix)  # infix = '1+1' => tokens = ['1', '+', '1']
+
+    reconstructed = ''.join(tokens)
+    if reconstructed != infix:  # Without this, an infix of "iabcd" will be tokenized into ['i'] and seen as valid
+        raise ValueError("Invalid characters detected in infix expression")
+
+    if tokens.count('(') - 1 == tokens.count(')'):  # If user forgot to add a closing parenthesis
+        tokens.append(')')
+
     stack = []  # Operator stack
     queue = []  # Output queue
 
     for index, token in enumerate(tokens):
-        if token.isnumeric() or token in ['i', 'j']:  # Numbers are automatically pushed into stack
+        if is_float(token) or token in ['i', 'j', 'pi']:  # Numbers are automatically pushed into stack
             queue.append(token)
         elif token == '-':
             if is_negative_sign(tokens, index):  # Treat negative sign differently
@@ -93,10 +113,12 @@ def eval_postfix(postfix) -> float:
     stack = []
 
     for token in postfix:
-        if token.isnumeric():
+        if is_float(token):
             stack.append(float(token))
         elif token == 'i' or token == 'j':
             stack.append(complex(0.0, 1.0))
+        elif token == 'pi':
+            stack.append(math.pi)
         elif token == 'unary_minus':
             if len(stack) < 1:
                 raise ValueError('Invalid expression')

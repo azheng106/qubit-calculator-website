@@ -13,46 +13,44 @@
     <h1>3-Qubit State Classifier</h1>
     <p>Enter the 8 complex numbers for your 3-qubit state in the boxes below. <br>
         Type "i" for <span>&#8730;</span>-1 and "sqrt" for <span>&#8730;</span>. Eg.<span>&#8730;</span>3 = sqrt(3) <br>
-        Other operations supported: + - * / ^ sin cos tan
+        Other operations supported: + - * / ^ sin cos tan <br>
+        Trig functions use radians. Input "pi" for 3.1415... <br><br>
+        c<sub>0</sub> -> c<sub>7</sub> default to 0 if left blank
     </p>
 </body>
 
 <form id="stateForm">
     <div class="input_group">
-        <label for="coefficient">Coefficient (leave blank for 1)</label>
-        <input type="text" id="coefficient" autocomplete = "off">
-    </div>
-    <div class="input_group">
         <label for="c0">c<sub>0</sub> |000></label>
-        <input type="text" id="c0" autocomplete = "off" required>
+        <input type="text" id="c0" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c1">c<sub>1</sub> |001></label>
-        <input type="text" id="c1" autocomplete = "off" required>
+        <input type="text" id="c1" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c2">c<sub>2</sub> |010></label>
-        <input type="text" id="c2" autocomplete = "off" required>
+        <input type="text" id="c2" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c3">c<sub>3</sub> |011></label>
-        <input type="text" id="c3" autocomplete = "off" required>
+        <input type="text" id="c3" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c4">c<sub>4</sub> |100></label>
-        <input type="text" id="c4" autocomplete = "off" required>
+        <input type="text" id="c4" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c5">c<sub>5</sub> |101></label>
-        <input type="text" id="c5" autocomplete = "off" required>
+        <input type="text" id="c5" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c6">c<sub>6</sub> |110></label>
-        <input type="text" id="c6" autocomplete = "off" required>
+        <input type="text" id="c6" autocomplete = "off" placeholder="0">
     </div>
     <div class="input_group">
         <label for="c7">c<sub>7</sub> |111></label>
-        <input type="text" id="c7" autocomplete = "off" required>
+        <input type="text" id="c7" autocomplete = "off" placeholder="0">
     </div>
     <button type="submit">Calculate</button>
     <button type="reset">Reset</button>
@@ -64,7 +62,6 @@
     document.getElementById('stateForm').onsubmit = function(event) {
         event.preventDefault(); // Prevent the default form behavior (reloading the page)
         const data = {
-            coeff: document.getElementById('coefficient').value,
             c0: document.getElementById('c0').value,
             c1: document.getElementById('c1').value,
             c2: document.getElementById('c2').value,
@@ -81,11 +78,19 @@
             },
             body: JSON.stringify(data),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) { // If response code != 200, throw response and go to .catch block below
+                throw response;
+            }
+            return response.json()
+        })
         .then(data => {
             document.getElementById('result').textContent = data.classification;
-            document.getElementById('normal').textContent = 'State is normalized: ' + data.normal;
-        });
+            document.getElementById('normal').textContent = data.normal;
+        })
+            .catch(() => { // Catch error, print message to website
+                document.getElementById('result').textContent = "Input error";
+            });
     };
 </script>
 <script> <!-- Remove the previous results when the user presses "reset" -->

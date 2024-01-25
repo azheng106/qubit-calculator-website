@@ -13,6 +13,11 @@ body {
     gap: 8px;
 }
 
+.input_group input::placeholder {
+    color: gray;
+    opacity: 100%;
+}
+
 h1 {
     color: darkblue;
 }

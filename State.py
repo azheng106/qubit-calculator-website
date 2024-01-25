@@ -55,9 +55,7 @@ class State:
             return EqClass.GHZ
 
     def is_normal(self) -> bool:
-        x = self.c0**2
-        y = self.c7**2
-        return (self.c0 ** 2 + self.c1 ** 2 + self.c2 ** 2 + self.c3 ** 2 + self.c4 ** 2 + self.c5 ** 2 + self.c6 ** 2 + self.c7 ** 2) == 1
+        return (abs(self.c0) ** 2 + abs(self.c1) ** 2 + abs(self.c2) ** 2 + abs(self.c3) ** 2 + abs(self.c4) ** 2 + abs(self.c5) ** 2 + abs(self.c6) ** 2 + abs(self.c7) ** 2) == 1
 
 
 class EqClass(Enum):
