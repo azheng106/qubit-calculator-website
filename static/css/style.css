@@ -15,7 +15,7 @@ body {
 
 .input_group input::placeholder {
     color: gray;
-    opacity: 100%;
+    opacity: 40%;
 }
 
 h1 {

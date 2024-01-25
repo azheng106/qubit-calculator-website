@@ -56,7 +56,6 @@
     <button type="reset">Reset</button>
 </form>
 <div id="result"></div>
-<div id="normal"></div>
 
 <script> <!-- Logic for returning the SLOCC class when user presses "submit" -->
     document.getElementById('stateForm').onsubmit = function(event) {
@@ -86,18 +85,15 @@
         })
         .then(data => {
             document.getElementById('result').textContent = data.classification;
-            document.getElementById('normal').textContent = data.normal;
         })
             .catch(() => { // Catch error, print message to website
                 document.getElementById('result').textContent = "Input error";
-                document.getElementById('normal').textContent = '';
             });
     };
 </script>
 <script> <!-- Remove the previous results when the user presses "reset" -->
     document.getElementById('stateForm').onreset = function() {
         document.getElementById('result').textContent = '';
-        document.getElementById('normal').textContent = '';
     }
 </script>
 </html>

@@ -35,13 +35,7 @@ def calculate():
 
         classification = state.get_state_class().value
 
-        if state.is_normal():
-            return_text = ''
-        else:
-            return_text = 'State is not normalized'
-
-        return jsonify({'classification': 'Belongs to ' + classification + ' SLOCC class',
-                        'normal': return_text})
+        return jsonify({'classification': 'Belongs to ' + classification + ' SLOCC class'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # Error code 400
 
