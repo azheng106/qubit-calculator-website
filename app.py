@@ -7,7 +7,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    """ Makes the website display when app.py is running and we visit http://localhost:5000"""
     return render_template('index.html')
 
 
