@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<head> <!-- Info that applies to entire website -->
     <title>3-Qubit State Classifier</title>
     <meta charset="UTF-8">
     <meta name="description" content="Quantum physics research calculator that takes a 3 qubit state as input and returns its SLOCC equivalence class">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
 </head>
 
-<body>
+<div id="3qubitPage" class="content" style="display:block;"> <!-- HTML code for 3 qubit SLOCC classificiation page -->
     <h1>3-Qubit-State SLOCC Classifier</h1>
     <h2>This classifier partitions pure states of three qubits into six SLOCC classes: GHZ, W, A-BC, B-AC, C-AB, and A-B-C.</h2>
     <p>Enter the 8 complex numbers for your 3-qubit-state in the boxes below. <br>
@@ -21,9 +21,8 @@
         Feedback/Suggestions: azheng106@gmail.com <br><br>
         c<sub>0</sub> -> c<sub>7</sub> default to 0 if left blank
     </p>
-</body>
 
-<form id="stateForm">
+    <form id="3qubitForm">
     <div class="input_group">
         <label for="c0">c<sub>0</sub> |000></label>
         <input type="text" id="c0" autocomplete = "off" placeholder="0">
@@ -60,9 +59,10 @@
     <button type="reset">Reset</button>
 </form>
 <div id="result"></div>
+</div>
 
 <script> <!-- Logic for returning the SLOCC class when user presses "submit" -->
-    document.getElementById('stateForm').onsubmit = function(event) {
+    document.getElementById('3qubitForm').onsubmit = function(event) {
         event.preventDefault(); // Prevent the default form behavior (reloading the page)
         const data = {
             c0: document.getElementById('c0').value,
@@ -74,7 +74,7 @@
             c6: document.getElementById('c6').value,
             c7: document.getElementById('c7').value,
         };
-        fetch('/calculate', {
+        fetch('/calculate/3qubit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -95,9 +95,87 @@
             });
     };
 </script>
+
 <script> <!-- Remove the previous results when the user presses "reset" -->
-    document.getElementById('stateForm').onreset = function() {
+    document.getElementById('3qubitForm').onreset = function() {
         document.getElementById('result').textContent = '';
     }
 </script>
+
+<div id="nQubitPage" class="content"> <!-- HTML code for n-qubit Entanglement page -->
+    <h1>n-Qubit-State Entanglement Detector</h1>
+    <h2>This classifier can calculate if a pure state of n qubits is entangled or not.</h2>
+    <p> Directions to be added here <br>
+        Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
+        Trig functions use radians.<br>
+        Feedback/Suggestions: azheng106@gmail.com <br><br>
+    </p>
+    <label for="nQubits"> Enter number of qubits: </label>
+    <input type="number" id="nQubits" class="input_group" placeholder="n>=4" min="4" required>
+
+    <div id="inputPairsContainer">
+        <div class="input-pair">
+            <label for="cn">Enter n for Cn</label>
+            <input type="number" id="cn" class="number-input" placeholder="n">
+            <label for="cnValue">Enter value for Cn </label>
+            <input type="text" id="cnValue" class="value-input" placeholder="value">
+        </div>
+    </div>
+
+    <button type="submit">Calculate</button>
+    <button type="reset">Reset</button>
+    <div id="result"></div>
+
+</div>
+
+<script> // Add new line when the user fills in one line of constants. Made by ChatGPT
+    const container = document.getElementById('inputPairsContainer');
+
+    container.addEventListener('input', function (event) {
+        const target = event.target;
+        const inputPairDiv = target.parentNode;
+        const numberInput = inputPairDiv.querySelector('.number-input');
+        const valueInput = inputPairDiv.querySelector('.value-input');
+
+        if (target.classList.contains('number-input') || target.classList.contains('value-input')) {
+            if (numberInput.value !== '' && valueInput.value !== '') {
+                addNewInputPair();
+            }
+        } else if (numberInput.value === '' && valueInput.value === '') {
+            if (container.childElementCount > 1) {
+                inputPairDiv.remove();
+            }
+        }
+    });
+
+    function addNewInputPair() {
+        const newDiv = document.createElement('div');
+        newDiv.classList.add('input-pair');
+        newDiv.innerHTML = `
+            <label for="cn">Enter n for Cn</label>
+            <input type="number" id="cn" class="number-input" placeholder="n">
+            <label for="cnValue">Enter value for Cn </label>
+            <input type="text" id="cnValue" class="value-input" placeholder="value">
+        `;
+        container.appendChild(newDiv);
+    }
+</script>
+
+<div class="switching-buttons"> <!-- Buttons to switch between the two web pages -->
+    <p> Switch between our calculators!</p>
+    <button id="3qubitButton">3 Qubit Classifier</button>
+    <button id="nQubitButton">n-Qubit Entanglement</button>
+</div>
+
+<script> <!-- Handle the buttons switching between the two web pages -->
+    document.getElementById('3qubitButton').onclick = function() {
+        document.getElementById('3qubitPage').style.display = 'block';
+        document.getElementById('nQubitPage').style.display = 'none';
+    }
+    document.getElementById('nQubitButton').onclick = function() {
+        document.getElementById('3qubitPage').style.display = 'none';
+        document.getElementById('nQubitPage').style.display = 'block';
+    }
+</script>
+
 </html>

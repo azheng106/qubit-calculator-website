@@ -10,7 +10,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/calculate', methods=['POST'])
+@app.route('/calculate/3qubit', methods=['POST'])
 def calculate():
     try:
         """ Calculate and print the SLOCC class on the website when the user inputs 8 constants and presses 'submit' """

@@ -9,6 +9,10 @@ body {
     max-width: 100%;
 }
 
+.content {
+    display:none; /* Hide nQubitPage by default */
+}
+
 .input_group {
     font-size: 0.85rem;
     display: grid;
@@ -37,6 +41,25 @@ button { /* Calculate and reset buttons */
     font-size: 0.85rem;
 }
 
+.switching-buttons {
+    position: fixed;
+    left: 0;
+    top:10%;
+    transform: translateY(-50%);
+}
+
+.switching-buttons p {
+    font-size: 0.7rem;
+}
+
+.switching-buttons button {
+    font-size: 0.7rem;
+    display: block;
+}
+
+.input_pair {
+    display: flex;
+}
 h1 {
     color: darkblue;
     font-size: 1.6rem;
