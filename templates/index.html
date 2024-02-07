@@ -105,59 +105,136 @@
 <div id="nQubitPage" class="content"> <!-- HTML code for n-qubit Entanglement page -->
     <h1>n-Qubit-State Entanglement Detector</h1>
     <h2>This classifier can calculate if a pure state of n qubits is entangled or not.</h2>
-    <p> Directions to be added here <br>
-        Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
+    <p> Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
         Trig functions use radians.<br>
-        Feedback/Suggestions: azheng106@gmail.com <br><br>
+        Feedback/Suggestions: azheng106@gmail.com <br> <br>
+        Only input non-zero constants for your state, omitted constants default to 0 <br><br>
     </p>
-    <label for="nQubits"> Enter number of qubits: </label>
-    <input type="number" id="nQubits" class="input_group" placeholder="n>=4" min="4" required>
 
-    <div id="inputPairsContainer">
-        <div class="input-pair">
-            <label for="cn">Enter n for Cn</label>
-            <input type="number" id="cn" class="number-input" placeholder="n">
-            <label for="cnValue">Enter value for Cn </label>
-            <input type="text" id="cnValue" class="value-input" placeholder="value">
+    <form id="nQubitForm">
+        <div id="nQubitsField">
+            <label for="nQubits"> Enter number of qubits (>=4): </label>
+            <input type="number" id="nQubits" class="n-input" placeholder="n>=4" min="4" required>
         </div>
-    </div>
 
-    <button type="submit">Calculate</button>
-    <button type="reset">Reset</button>
-    <div id="result"></div>
+        <div id="inputPairsContainer">
+            <div class="input-pair">
+                <div class="input-labels">
+                    <label for="cn">Constant number (C<sub>n</sub>)</label>
+                    <label for="cnValue">Enter value for C<sub>n</sub> </label>
+                </div>
+                <div class="input-fields">
+                    <input type="number" id="cn" class="number-input" placeholder="n">
+                    <input type="text" id="cnValue" class="value-input" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit">Calculate</button>
+        <button type="reset">Reset</button>
+    </form>
+    <div id="result1"></div>
 
 </div>
 
-<script> // Add new line when the user fills in one line of constants. Made by ChatGPT
+<script> <!-- Add new line when the user fills in one line of constants. Made by ChatGPT -->
     const container = document.getElementById('inputPairsContainer');
 
-    container.addEventListener('input', function (event) {
-        const target = event.target;
-        const inputPairDiv = target.parentNode;
-        const numberInput = inputPairDiv.querySelector('.number-input');
-        const valueInput = inputPairDiv.querySelector('.value-input');
+    container.addEventListener('input', function() { // Listen for user input
+        const inputPairs = container.querySelectorAll('.input-pair');
+        const lastInputPair = inputPairs[inputPairs.length - 1];
+        const inputsInLastPair = lastInputPair.querySelectorAll('input');
+        const allInputsFilled = Array.from(inputsInLastPair).every(input => input.value !== '');
 
-        if (target.classList.contains('number-input') || target.classList.contains('value-input')) {
-            if (numberInput.value !== '' && valueInput.value !== '') {
+        const numPairs = inputPairs.length;
+        let numQubits = getQubitNumber();
+        let maxQubits = 2 ** numQubits;
+
+        if (allInputsFilled && lastInputPair === container.lastElementChild) {
+            if (numPairs < maxQubits) {
                 addNewInputPair();
-            }
-        } else if (numberInput.value === '' && valueInput.value === '') {
-            if (container.childElementCount > 1) {
-                inputPairDiv.remove();
+                document.getElementById('result1').textContent = '';
+            } else {
+                document.getElementById('result1').textContent = 'Max qubit # exceeded (2^n), or # qubits box is invalid';
             }
         }
     });
 
     function addNewInputPair() {
         const newDiv = document.createElement('div');
-        newDiv.classList.add('input-pair');
+        newDiv.classList.add('input-pair', 'removable-input-pair'); // Add removable class tag for identification when reset is clicked
         newDiv.innerHTML = `
-            <label for="cn">Enter n for Cn</label>
+            <div class="input-fields">
             <input type="number" id="cn" class="number-input" placeholder="n">
-            <label for="cnValue">Enter value for Cn </label>
-            <input type="text" id="cnValue" class="value-input" placeholder="value">
+            <input type="text" id="cnValue" class="value-input" placeholder="0">
+            </div>
         `;
         container.appendChild(newDiv);
+    }
+
+    function getQubitNumber() {
+        const nQubitNumber = parseInt(document.getElementById('nQubits').value, 10);
+
+        if (!isNaN(nQubitNumber) && nQubitNumber >= 4) {
+            return nQubitNumber;
+        } else {
+            return 0;
+        }
+    }
+</script>
+
+<script> <!-- Calculate entanglement status when user presses submit -->
+    document.getElementById('nQubitForm').onsubmit = function(event) {
+        event.preventDefault();
+        const numQubits = document.getElementById('nQubits').value;
+        const inputPairs = document.querySelectorAll('#inputPairsContainer .input-pair');
+        let pairsData = {};
+
+        inputPairs.forEach(pair => { // Put user pairs data into a dictionary
+            const numberInput = pair.querySelector('.number-input').value;
+            pairsData[numberInput] = pair.querySelector('.value-input').value;
+        });
+
+        const dataToSend = { // Combine # qubits with pairsData
+            n : numQubits,
+            pairs: pairsData
+        };
+
+        fetch('/calculate/nQubit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw response;
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('result1').textContent = data.classification;
+            })
+            .catch((error) => {
+                error.json().then(errorMessage => {
+                    document.getElementById('result1').textContent = errorMessage.error
+                });
+            })
+    }
+</script>
+
+<script> <!-- Remove previously added input fields when reset button is clicked -->
+    document.getElementById('nQubitForm').onreset = function() {
+        document.getElementById('result1').textContent = '';
+        removeAllInputPairs();
+    }
+
+    function removeAllInputPairs() {
+        const removableInputPairs = document.querySelectorAll('.removable-input-pair');
+        removableInputPairs.forEach(function(pair) {
+            pair.remove();
+        });
     }
 </script>
 

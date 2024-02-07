@@ -22,7 +22,7 @@ body {
 }
 
 .input_group label {
-    text-align:right;
+    text-align: right;
 }
 
 .input_group input { /* Input fields */
@@ -57,9 +57,44 @@ button { /* Calculate and reset buttons */
     display: block;
 }
 
-.input_pair {
+.input-labels, .input-fields {
     display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+    --label-margin-right: 110px;
 }
+
+.input-labels > label {
+    font-size: 0.85rem;
+    margin-right: var(--label-margin-right);
+}
+
+.input-fields > input {
+    font-size: 0.8rem;
+    margin-right: calc(var(--label-margin-right) + 160px); /* To align */
+}
+
+.number-input {
+    max-width: 150px; /* Set a max-width for the input fields */
+}
+
+.value-input {
+    max-width: 500px;
+}
+
+#nQubitsField {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    padding-bottom: 5px;
+}
+
+.n-input {
+    font-size: 0.8rem;
+    max-width: 150px;
+}
+
 h1 {
     color: darkblue;
     font-size: 1.6rem;
