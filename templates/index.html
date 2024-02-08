@@ -113,8 +113,8 @@
 
     <form id="nQubitForm">
         <div id="nQubitsField">
-            <label for="nQubits"> Enter number of qubits (>=4): </label>
-            <input type="number" id="nQubits" class="n-input" placeholder="n>=4" min="4" required>
+            <label for="nQubits"> Enter number of qubits (>=3): </label>
+            <input type="number" id="nQubits" class="n-input" placeholder="n>=3" min="3" required>
         </div>
 
         <div id="inputPairsContainer">
@@ -147,15 +147,15 @@
         const allInputsFilled = Array.from(inputsInLastPair).every(input => input.value !== '');
 
         const numPairs = inputPairs.length;
-        let numQubits = getQubitNumber();
-        let maxQubits = 2 ** numQubits;
+        const numQubits = getQubitNumber();
+        const maxQubits = 2 ** numQubits;
 
         if (allInputsFilled && lastInputPair === container.lastElementChild) {
             if (numPairs < maxQubits) {
                 addNewInputPair();
                 document.getElementById('result1').textContent = '';
             } else {
-                document.getElementById('result1').textContent = 'Max qubit # exceeded (2^n), or # qubits box is invalid';
+                document.getElementById('result1').textContent = 'Max row # reached, or qubit # box is invalid';
             }
         }
     });
@@ -175,7 +175,7 @@
     function getQubitNumber() {
         const nQubitNumber = parseInt(document.getElementById('nQubits').value, 10);
 
-        if (!isNaN(nQubitNumber) && nQubitNumber >= 4) {
+        if (!isNaN(nQubitNumber) && nQubitNumber >= 3) {
             return nQubitNumber;
         } else {
             return 0;
@@ -218,7 +218,7 @@
             })
             .catch((error) => {
                 error.json().then(errorMessage => {
-                    document.getElementById('result1').textContent = errorMessage.error
+                    document.getElementById('result1').textContent = 'Error: ' + errorMessage.error
                 });
             })
     }

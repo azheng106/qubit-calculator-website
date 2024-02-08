@@ -44,16 +44,25 @@ def calculate_slocc():
 def calculate_entanglement():
     try:
         data = request.json  # Ex. of data: {'n': '4', 'pairs': {'3': '123', '2': '13', '4': '12', '': ''}}
+        # print(f'data: {data}')
         num_qubits = data['n']
 
         pairs = data['pairs']
-        pairs.popitem()  # Remove the last entry in dictionary, which is an empty pair ('': '')
+        if list(pairs)[-1] == '':
+            pairs.popitem()  # Remove the last entry in dictionary if it is an empty pair ('': '')
+
+
         for key in pairs:  # Blank value entries default to 0
             if pairs[key] == '':
                 pairs[key] = '0'
+            if int(key) < 0:
+                raise ValueError('Constant number < 0')
+
+        print(f"Pairs: {pairs}")
+
         qubit_value_pairs = {convert_to_basic_state(int(num_qubits), int(key)): eval_postfix(infix_to_postfix(value)) for key, value in pairs.items()}
 
-        #print(f"Original state: {qubit_value_pairs}")
+        # print(f"Original state: {qubit_value_pairs}")
         classification = 'State is unknown'
         if is_entangled(qubit_value_pairs, int(num_qubits)):
             classification = 'State is entangled'

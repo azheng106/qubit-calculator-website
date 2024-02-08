@@ -4,7 +4,7 @@ def convert_to_basic_state(num_qubits, constant_number) -> str:
     """
     num_qubits = int(num_qubits)  # Convert string to int
     if constant_number > (2 ** num_qubits - 1):
-        raise Exception
+        raise ValueError('Constant number >= 2^n')
     binary = bin(constant_number).replace('0b', '')
     while len(binary) < num_qubits:
         binary = '0' + binary
@@ -32,17 +32,14 @@ def is_entangled_2qubit(pairs_dictionary) -> bool:
 
 
 def is_entangled(pairs_dictionary, n) -> bool:
-    #print(f"Checking {n}-qubit state: {pairs_dictionary}")
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
     else:
         entangled_count = 0
         for i in range(n):
             qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
-            #print(f"Qubit {i} removed: {qubit_i_removed}. Count = {entangled_count}")
             if is_entangled(qubit_i_removed, n - 1):
                 entangled_count += 1
-                #print(f"State {qubit_i_removed} is entangled. Count = {entangled_count}")
             if entangled_count >= 2:
                 return True
     return False
