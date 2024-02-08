@@ -51,7 +51,6 @@ def calculate_entanglement():
         if list(pairs)[-1] == '':
             pairs.popitem()  # Remove the last entry in dictionary if it is an empty pair ('': '')
 
-
         for key in pairs:  # Blank value entries default to 0
             if pairs[key] == '':
                 pairs[key] = '0'
@@ -60,7 +59,8 @@ def calculate_entanglement():
 
         print(f"Pairs: {pairs}")
 
-        qubit_value_pairs = {convert_to_basic_state(int(num_qubits), int(key)): eval_postfix(infix_to_postfix(value)) for key, value in pairs.items()}
+        qubit_value_pairs = {convert_to_basic_state(int(num_qubits), int(key)): eval_postfix(infix_to_postfix(value))
+                             for key, value in pairs.items()}
 
         # print(f"Original state: {qubit_value_pairs}")
         classification = 'State is unknown'
