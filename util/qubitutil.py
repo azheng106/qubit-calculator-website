@@ -1,3 +1,13 @@
+from enum import Enum
+from sympy import isprime
+
+
+class EntanglementStatus(Enum):
+    ENTANGLED = 'State is entangled'
+    UNKNOWN = 'State is unknown'
+    SEPARABLE = 'State is separable'
+
+
 def convert_to_basic_state(num_qubits, constant_number) -> str:
     """
     Convert a constant number to its basic state (binary) representation. Ex. C3 is |011>
@@ -21,25 +31,51 @@ def remove_qubit_n(n, pairs_dictionary) -> dict:
     return {(key[:n] + key[n + 1:]): value for key, value in pairs_dictionary.items()}
 
 
-def is_entangled_2qubit(pairs_dictionary) -> bool:
+def is_entangled_2qubit(pairs_dictionary) -> Enum:
+    """
+    Check if a 2 qubit state is entangled
+    """
     if len(pairs_dictionary) > 4:
         raise ValueError('Not a 2 qubit state')
     c0 = pairs_dictionary.get('00', 0)  # Default to 0 if not found
     c1 = pairs_dictionary.get('01', 0)
     c2 = pairs_dictionary.get('10', 0)
     c3 = pairs_dictionary.get('11', 0)
-    return c0 * c3 != c1 * c2
+    if c0 * c3 != c1 * c2:
+        return EntanglementStatus.ENTANGLED
+    else:
+        return EntanglementStatus.SEPARABLE
 
 
-def is_entangled(pairs_dictionary, n) -> bool:
+def is_entangled(pairs_dictionary, n) -> Enum:
+    """
+    Check if an n-qubit state is entangled, unknown, or separable. A state is entangled if two of its children (with one qubit removed) are entangled
+    :param pairs_dictionary: State to check
+    :param n: Number of qubits in the state
+    """
+    print(f'State: {pairs_dictionary}')
+
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
+
+    num_nonzero_coeffs = len(pairs_dictionary)
+    if isprime(num_nonzero_coeffs):
+        basic_states = list(pairs_dictionary.keys())
+        for i in range(len(basic_states[0])):
+            if all(basic_state[i] == '0' for basic_state in basic_states) or \
+                    all(basic_state[i] == '1' for basic_state in basic_states):
+                print(f'Qubit #: {i}')
+                return EntanglementStatus.SEPARABLE
+        return EntanglementStatus.ENTANGLED
     else:
-        entangled_count = 0
-        for i in range(n):
-            qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
-            if is_entangled(qubit_i_removed, n - 1):
-                entangled_count += 1
-            if entangled_count >= 2:
-                return True
-    return False
+        if n == 2:
+            return is_entangled_2qubit(pairs_dictionary)
+        else:
+            entangled_count = 0
+            for i in range(n):
+                qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
+                if is_entangled(qubit_i_removed, n - 1):
+                    entangled_count += 1
+                if entangled_count >= 2:
+                    return EntanglementStatus.ENTANGLED
+        return EntanglementStatus.UNKNOWN

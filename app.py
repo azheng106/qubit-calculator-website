@@ -63,11 +63,10 @@ def calculate_entanglement():
                              for key, value in pairs.items()}
 
         # print(f"Original state: {qubit_value_pairs}")
-        classification = 'State is unknown'
-        if is_entangled(qubit_value_pairs, int(num_qubits)):
-            classification = 'State is entangled'
 
-        return jsonify({'classification': classification})
+        classification = is_entangled(qubit_value_pairs, int(num_qubits))
+
+        return jsonify({'classification': classification.value})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
