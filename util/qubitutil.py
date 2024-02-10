@@ -64,7 +64,6 @@ def is_entangled(pairs_dictionary, n) -> Enum:
         for i in range(len(basic_states[0])):
             if all(basic_state[i] == '0' for basic_state in basic_states) or \
                     all(basic_state[i] == '1' for basic_state in basic_states):
-                print(f'Qubit #: {i}')
                 return EntanglementStatus.SEPARABLE
         return EntanglementStatus.ENTANGLED
     else:

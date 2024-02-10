@@ -115,7 +115,7 @@
     <form id="nQubitForm">
         <div id="nQubitsField">
             <label for="nQubits"> Enter number of qubits (>=2): </label>
-            <input type="number" id="nQubits" class="n-input" placeholder="n>=2" min="2" required>
+            <input type="number" id="nQubits" class="n-input" autocomplete = "off" placeholder="n>=2" min="2" required>
         </div>
 
         <p><br>
@@ -129,8 +129,8 @@
                     <label for="cnValue">Enter value for C<sub>n</sub> </label>
                 </div>
                 <div class="input-fields">
-                    <input type="number" id="cn" class="number-input" placeholder="n">
-                    <input type="text" id="cnValue" class="value-input" placeholder="0">
+                    <input type="number" id="cn" class="number-input" autocomplete = "off" placeholder="n">
+                    <input type="text" id="cnValue" class="value-input" autocomplete = "off" placeholder="0">
                 </div>
             </div>
         </div>
@@ -170,8 +170,8 @@
         newDiv.classList.add('input-pair', 'removable-input-pair'); // Add removable class tag for identification when reset is clicked
         newDiv.innerHTML = `
             <div class="input-fields">
-            <input type="number" id="cn" class="number-input" placeholder="n">
-            <input type="text" id="cnValue" class="value-input" placeholder="0">
+            <input type="number" id="cn" class="number-input" autocomplete = "off" placeholder="n">
+            <input type="text" id="cnValue" class="value-input" autocomplete = "off" placeholder="0">
             </div>
         `;
         container.appendChild(newDiv);
