@@ -74,8 +74,10 @@ def is_entangled(pairs_dictionary, n) -> Enum:
             entangled_count = 0
             for i in range(n):
                 qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
-                if is_entangled(qubit_i_removed, n - 1):
+                if is_entangled(qubit_i_removed, n - 1) == EntanglementStatus.ENTANGLED:
                     entangled_count += 1
+                    print(f'{qubit_i_removed} is entangled. Entangled Count for {pairs_dictionary}: {entangled_count}')
                 if entangled_count >= 2:
+                    print(f'Entangled count >2, {pairs_dictionary} is entangled')
                     return EntanglementStatus.ENTANGLED
         return EntanglementStatus.UNKNOWN
