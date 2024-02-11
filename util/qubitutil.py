@@ -47,7 +47,8 @@ def is_entangled_2qubit(pairs_dictionary) -> Enum:
         return EntanglementStatus.SEPARABLE
 
 
-cached_results = {}  # Use memoization to drastically reduce run-time of is_entangled() function.
+cached_results = {}  # Use memoization to drastically reduce run-time of is_entangled() function. Before this, it took 5+ mins for 12-qubit state. Now it takes a few seconds for 31 qubits!
+
 
 
 def is_entangled(pairs_dictionary, n) -> Enum:
