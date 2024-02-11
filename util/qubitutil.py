@@ -61,7 +61,7 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
 
-    if dict_to_hashable(pairs_dictionary) in cached_results:
+    if dict_to_hashable(pairs_dictionary) in cached_results:  # If result has previously been calculated, use cached result instead of calculating it again.
         return cached_results.get(dict_to_hashable(pairs_dictionary))
 
     if isprime(len(pairs_dictionary)):
@@ -92,6 +92,9 @@ def is_entangled(pairs_dictionary, n) -> Enum:
 
 
 def dict_to_hashable(dictionary):
+    """
+    Convert a dictionary to a hashable type (tuple) so it can be used as a key in a dictionary
+    """
     return tuple(dictionary.items())
 
 
