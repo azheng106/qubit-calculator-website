@@ -50,7 +50,6 @@ def is_entangled_2qubit(pairs_dictionary) -> Enum:
 cached_results = {}  # Use memoization to drastically reduce run-time of is_entangled() function. Before this, it took 5+ mins for 12-qubit state. Now it takes a few seconds for 31 qubits!
 
 
-
 def is_entangled(pairs_dictionary, n) -> Enum:
     """
     Check if an n-qubit state is entangled, unknown, or separable. A state is entangled if two of its children (with one qubit removed) are entangled
@@ -94,6 +93,7 @@ def is_entangled(pairs_dictionary, n) -> Enum:
 
 def dict_to_hashable(dictionary):
     return tuple(dictionary.items())
+
 
 """ Old calculation without prime number thing
 def old_calc(pairs_dictionary, n) -> Enum:
