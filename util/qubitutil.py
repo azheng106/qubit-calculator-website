@@ -47,6 +47,9 @@ def is_entangled_2qubit(pairs_dictionary) -> Enum:
         return EntanglementStatus.SEPARABLE
 
 
+cached_results = {}  # Use memoization to drastically reduce run-time of is_entangled() function.
+
+
 def is_entangled(pairs_dictionary, n) -> Enum:
     """
     Check if an n-qubit state is entangled, unknown, or separable. A state is entangled if two of its children (with one qubit removed) are entangled
@@ -54,16 +57,21 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     :param n: Number of qubits in the state
     """
     # print(f'State: {pairs_dictionary}')
+
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
 
-    num_nonzero_coeffs = len(pairs_dictionary)
-    if isprime(num_nonzero_coeffs):
+    if dict_to_hashable(pairs_dictionary) in cached_results:
+        return cached_results.get(dict_to_hashable(pairs_dictionary))
+
+    if isprime(len(pairs_dictionary)):
         basic_states = list(pairs_dictionary.keys())
         for i in range(len(basic_states[0])):
             if all(basic_state[i] == '0' for basic_state in basic_states) or \
                     all(basic_state[i] == '1' for basic_state in basic_states):
+                cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.SEPARABLE
                 return EntanglementStatus.SEPARABLE
+        cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
         return EntanglementStatus.ENTANGLED
     else:
         if n == 2:
@@ -77,9 +85,14 @@ def is_entangled(pairs_dictionary, n) -> Enum:
                     # print(f'{qubit_i_removed} is entangled. Entangled Count for {pairs_dictionary}: {entangled_count}')
                 if entangled_count >= 2:
                     # print(f'Entangled count >2, {pairs_dictionary} is entangled')
+                    cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
                     return EntanglementStatus.ENTANGLED
+        cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.UNKNOWN
         return EntanglementStatus.UNKNOWN
 
+
+def dict_to_hashable(dictionary):
+    return tuple(dictionary.items())
 
 """ Old calculation without prime number thing
 def old_calc(pairs_dictionary, n) -> Enum:
