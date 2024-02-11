@@ -1,6 +1,8 @@
 from enum import Enum
 from sympy import isprime
 
+from util.state import State, EqClass
+
 
 class EntanglementStatus(Enum):
     ENTANGLED = 'State is entangled'
@@ -33,7 +35,7 @@ def remove_qubit_n(n, pairs_dictionary) -> dict:
 
 def is_entangled_2qubit(pairs_dictionary) -> Enum:
     """
-    Check if a 2 qubit state is entangled
+    Check if a 2 qubit state is entangled or separable
     """
     if len(pairs_dictionary) > 4:
         raise ValueError('Not a 2 qubit state')
@@ -42,6 +44,29 @@ def is_entangled_2qubit(pairs_dictionary) -> Enum:
     c2 = pairs_dictionary.get('10', 0)
     c3 = pairs_dictionary.get('11', 0)
     if c0 * c3 != c1 * c2:
+        return EntanglementStatus.ENTANGLED
+    else:
+        return EntanglementStatus.SEPARABLE
+
+
+def is_entangled_3qubit(pairs_dictionary) -> Enum:
+    """
+    Check if a 3 qubit state is entangled or separable
+    """
+    if len(pairs_dictionary) > 8:
+        raise ValueError('Not a 3 qubit state')
+    c0 = pairs_dictionary.get('000', 0)  # Default to 0 if not found
+    c1 = pairs_dictionary.get('001', 0)
+    c2 = pairs_dictionary.get('010', 0)
+    c3 = pairs_dictionary.get('011', 0)
+    c4 = pairs_dictionary.get('100', 0)
+    c5 = pairs_dictionary.get('101', 0)
+    c6 = pairs_dictionary.get('110', 0)
+    c7 = pairs_dictionary.get('111', 0)
+
+    state = State(c0, c1, c2, c3, c4, c5, c6, c7)
+    slocc_class = state.get_state_class()
+    if slocc_class == EqClass.GHZ or slocc_class == EqClass.W:
         return EntanglementStatus.ENTANGLED
     else:
         return EntanglementStatus.SEPARABLE
@@ -60,6 +85,9 @@ def is_entangled(pairs_dictionary, n) -> Enum:
 
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
+
+    if n == 3:
+        return is_entangled_3qubit(pairs_dictionary)
 
     if dict_to_hashable(pairs_dictionary) in cached_results:  # If result has previously been calculated, use cached result instead of calculating it again.
         return cached_results.get(dict_to_hashable(pairs_dictionary))
