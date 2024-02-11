@@ -57,7 +57,7 @@ def calculate_entanglement():
             if int(key) < 0:
                 raise ValueError('Constant number < 0')
 
-        print(f"Pairs: {pairs}")
+        # print(f"Pairs: {pairs}")
 
         qubit_value_pairs = {convert_to_basic_state(int(num_qubits), int(key)): eval_postfix(infix_to_postfix(value))
                              for key, value in pairs.items()}

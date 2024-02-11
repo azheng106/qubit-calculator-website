@@ -104,8 +104,7 @@
 
 <div id="nQubitPage" class="content"> <!-- HTML code for n-qubit Entanglement page -->
     <h1>n-Qubit-State Entanglement Detector</h1>
-    <h2>This classifier can calculate if a pure state of n qubits is entangled or not. <br>
-        For 3-qubit-states, please use the 3 Qubit Classifier.</h2>
+    <h2>This classifier can calculate if a pure state of n qubits is entangled or not.</h2>
     <p> Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
         Trig functions use radians.<br>
         Feedback/Suggestions: azheng106@gmail.com <br> <br>
@@ -191,6 +190,7 @@
 <script> <!-- Calculate entanglement status when user presses submit -->
     document.getElementById('nQubitForm').onsubmit = function(event) {
         event.preventDefault();
+        document.getElementById('result1').textContent = 'Calculating...';
         const numQubits = document.getElementById('nQubits').value;
         const inputPairs = document.querySelectorAll('#inputPairsContainer .input-pair');
         let pairsData = {};
