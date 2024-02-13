@@ -190,7 +190,7 @@
 <script> <!-- Calculate entanglement status when user presses submit -->
     document.getElementById('nQubitForm').onsubmit = function(event) {
         event.preventDefault();
-        document.getElementById('result1').textContent = 'Calculating...';
+        document.getElementById('result1').textContent = 'Calculating... (Refresh the page if it takes too long)';
         const numQubits = document.getElementById('nQubits').value;
         const inputPairs = document.querySelectorAll('#inputPairsContainer .input-pair');
         let pairsData = {};

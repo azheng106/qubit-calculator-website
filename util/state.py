@@ -19,8 +19,7 @@ class State:
         """
         d = ((self.c0 * self.c7 + self.c1 * self.c6 - self.c2 * self.c5 - self.c3 * self.c4) ** 2
              - 4 * (self.c2 * self.c4 - self.c0 * self.c6) * (self.c3 * self.c5 - self.c1 * self.c7))
-        tau = 4 * abs(d)  # If dealing with complex numbers , we'll probably have to change this
-        print(tau)
+        tau = 4 * abs(d)
         return tau
 
     def get_state_class(self) -> Enum:
