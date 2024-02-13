@@ -72,11 +72,11 @@ button { /* Calculate and reset buttons */
 
 .input-fields > input {
     font-size: 0.8rem;
-    margin-right: calc(var(--label-margin-right) + 160px); /* To align */
+    margin-right: calc(var(--label-margin-right) + 110px); /* To align */
 }
 
 .number-input {
-    max-width: 150px; /* Set a max-width for the input fields */
+    max-width: 200px; /* Set a max-width for the input fields */
 }
 
 .value-input {
