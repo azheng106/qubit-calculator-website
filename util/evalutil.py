@@ -66,7 +66,8 @@ def infix_to_postfix(infix) -> list:
     :return: Postfix
     """
     infix = infix.replace(' ', '')  # Remove spaces
-    tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan|pi', infix)  # infix = '1+1' => tokens = ['1', '+', '1']
+    tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan|pi',
+                        infix)  # infix = '1+1' => tokens = ['1', '+', '1']
 
     reconstructed = ''.join(tokens)
     if reconstructed != infix:  # Without this, an infix of "iabcd" will be tokenized into ['i'] and seen as valid
@@ -75,11 +76,17 @@ def infix_to_postfix(infix) -> list:
     if tokens.count('(') - 1 == tokens.count(')'):  # If user forgot to add a closing parenthesis
         tokens.append(')')
 
+    for i in range(len(tokens) - 1):  # If user inputs '3i', make sure postfix evaluator knows to multiply 3 and i
+        curr_token = tokens[i]
+        next_token = tokens[i + 1]
+        if is_float(curr_token) and next_token in ['i', 'j', 'pi']:  # ['2', 'i'] => ['2', '*', 'i']
+            tokens.insert(i+1, '*')
+
     stack = []  # Operator stack
     queue = []  # Output queue
 
     for index, token in enumerate(tokens):
-        if is_float(token) or token in ['i', 'j', 'pi']:  # Numbers are automatically pushed into stack
+        if is_float(token) or token in ['i', 'j', 'pi']:  # Numbers are automatically pushed into queue
             queue.append(token)
         elif token == '-':
             if is_negative_sign(tokens, index):  # Treat negative sign differently

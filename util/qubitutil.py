@@ -89,6 +89,9 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     if n == 3:
         return is_entangled_3qubit(pairs_dictionary)
 
+    if len(pairs_dictionary) == 1:
+        return EntanglementStatus.SEPARABLE
+
     if dict_to_hashable(pairs_dictionary) in cached_results:  # If result has previously been calculated, use cached result instead of calculating it again.
         return cached_results.get(dict_to_hashable(pairs_dictionary))
 
