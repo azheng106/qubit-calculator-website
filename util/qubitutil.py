@@ -81,7 +81,6 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     :param pairs_dictionary: State to check
     :param n: Number of qubits in the state
     """
-    # print(f'State: {pairs_dictionary}')
 
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
@@ -107,9 +106,7 @@ def is_entangled(pairs_dictionary, n) -> Enum:
         qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
         if is_entangled(qubit_i_removed, n - 1) == EntanglementStatus.ENTANGLED:
             entangled_count += 1
-            # print(f'{qubit_i_removed} is entangled. Entangled Count for {pairs_dictionary}: {entangled_count}')
         if entangled_count >= 2:
-            # print(f'Entangled count >2, {pairs_dictionary} is entangled')
             cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
             return EntanglementStatus.ENTANGLED
 

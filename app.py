@@ -5,9 +5,7 @@ from util.qubitutil import *
 
 app = Flask(__name__)
 
-print(evaluate('sqrt2'))
-print(evaluate('sqrt4/sqrt2'))
-print(evaluate('sqrt8/sqrt4')==evaluate('sqrt2'))
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -46,7 +44,6 @@ def calculate_slocc():
 def calculate_entanglement():
     try:
         data = request.json  # Ex. of data: {'n': '4', 'pairs': {'3': '123', '2': '13', '4': '12', '': ''}}
-        # print(f'data: {data}')
         num_qubits = data['n']
 
         pairs = data['pairs']
