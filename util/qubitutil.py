@@ -95,26 +95,24 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     if dict_to_hashable(pairs_dictionary) in cached_results:  # If result has previously been calculated, use cached result instead of calculating it again.
         return cached_results.get(dict_to_hashable(pairs_dictionary))
 
-    if isprime(len(pairs_dictionary)):
-        basic_states = list(pairs_dictionary.keys())
-        for i in range(len(basic_states[0])):
-            if all(basic_state[i] == '0' for basic_state in basic_states) or \
-                    all(basic_state[i] == '1' for basic_state in basic_states):
-                cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.SEPARABLE
-                return EntanglementStatus.SEPARABLE
-        cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
-        return EntanglementStatus.ENTANGLED
-    else:
-        entangled_count = 0
-        for i in range(n):
-            qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
-            if is_entangled(qubit_i_removed, n - 1) == EntanglementStatus.ENTANGLED:
-                entangled_count += 1
-                # print(f'{qubit_i_removed} is entangled. Entangled Count for {pairs_dictionary}: {entangled_count}')
-            if entangled_count >= 2:
-                # print(f'Entangled count >2, {pairs_dictionary} is entangled')
-                cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
-                return EntanglementStatus.ENTANGLED
+    basic_states = list(pairs_dictionary.keys())
+    for i in range(len(basic_states[0])):
+        if all(basic_state[i] == '0' for basic_state in basic_states) or \
+                all(basic_state[i] == '1' for basic_state in basic_states):
+            cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.SEPARABLE
+            return EntanglementStatus.SEPARABLE
+
+    entangled_count = 0
+    for i in range(n):
+        qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
+        if is_entangled(qubit_i_removed, n - 1) == EntanglementStatus.ENTANGLED:
+            entangled_count += 1
+            # print(f'{qubit_i_removed} is entangled. Entangled Count for {pairs_dictionary}: {entangled_count}')
+        if entangled_count >= 2:
+            # print(f'Entangled count >2, {pairs_dictionary} is entangled')
+            cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
+            return EntanglementStatus.ENTANGLED
+
     cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.UNKNOWN
     return EntanglementStatus.UNKNOWN
 
