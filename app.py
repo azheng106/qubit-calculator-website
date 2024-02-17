@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify, render_template
-from util.evalutil import infix_to_postfix, eval_postfix
-from util.state import State
+
+from util.evalutil import evaluate
 from util.qubitutil import *
 
 app = Flask(__name__)
 
-
+print(evaluate('sqrt2'))
+print(evaluate('sqrt4/sqrt2'))
+print(evaluate('sqrt8/sqrt4')==evaluate('sqrt2'))
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -22,16 +24,16 @@ def calculate_slocc():
                 data[key] = '0'
 
         # Evaluate the expressions that the user inputted
-        c0 = eval_postfix(infix_to_postfix(data['c0']))
-        c1 = eval_postfix(infix_to_postfix(data['c1']))
-        c2 = eval_postfix(infix_to_postfix(data['c2']))
-        c3 = eval_postfix(infix_to_postfix(data['c3']))
-        c4 = eval_postfix(infix_to_postfix(data['c4']))
-        c5 = eval_postfix(infix_to_postfix(data['c5']))
-        c6 = eval_postfix(infix_to_postfix(data['c6']))
-        c7 = eval_postfix(infix_to_postfix(data['c7']))
+        c0 = evaluate(data['c0'])
+        c1 = evaluate(data['c1'])
+        c2 = evaluate(data['c2'])
+        c3 = evaluate(data['c3'])
+        c4 = evaluate(data['c4'])
+        c5 = evaluate(data['c5'])
+        c6 = evaluate(data['c6'])
+        c7 = evaluate(data['c7'])
 
-        state = State(c0, c1, c2, c3, c4, c5, c6, c7)
+        state = ThreeQubitState(c0, c1, c2, c3, c4, c5, c6, c7)
 
         classification = state.get_state_class().value
 
@@ -57,12 +59,17 @@ def calculate_entanglement():
             if int(key) < 0:
                 raise ValueError('Constant number < 0')
 
-        # print(f"Pairs: {pairs}")
-
-        qubit_value_pairs = {convert_to_basic_state(int(num_qubits), int(key)): eval_postfix(infix_to_postfix(value))
+        qubit_value_pairs = {convert_to_basic_state(int(num_qubits), int(key)): evaluate(value)
                              for key, value in pairs.items()}
 
-        # print(f"Original state: {qubit_value_pairs}")
+        # Fix approximation errors with Python sqrt
+        tolerance = 1e-10
+        keys = list(qubit_value_pairs.keys())
+        values = list(qubit_value_pairs.values())
+        for i in range(len(qubit_value_pairs) - 1):
+            if abs(values[i] - values[i+1]) < tolerance:  # If values are close enough, then set equal to each other
+                values[i+1] = values[i]
+        qubit_value_pairs = dict(zip(keys, values))  # Recreate the dictionary with new values
 
         classification = is_entangled(qubit_value_pairs, int(num_qubits))
 

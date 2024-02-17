@@ -162,3 +162,7 @@ def eval_postfix(postfix) -> float:
             stack.append(result)
 
     return stack.pop()
+
+
+def evaluate(expression):
+    return eval_postfix(infix_to_postfix(expression))

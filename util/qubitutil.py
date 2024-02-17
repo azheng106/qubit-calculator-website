@@ -1,7 +1,7 @@
 from enum import Enum
 from sympy import isprime
 
-from util.state import State, EqClass
+from util.threequbitstate import ThreeQubitState, EqClass
 
 
 class EntanglementStatus(Enum):
@@ -12,7 +12,7 @@ class EntanglementStatus(Enum):
 
 def convert_to_basic_state(num_qubits, constant_number) -> str:
     """
-    Convert a constant number to its basic state (binary) representation. Ex. C3 is |011>
+    Convert a constant number to its basic state (binary) representation. Ex. C3 => |011>
     """
     num_qubits = int(num_qubits)  # Convert string to int
     if constant_number > (2 ** num_qubits - 1):
@@ -64,7 +64,7 @@ def is_entangled_3qubit(pairs_dictionary) -> Enum:
     c6 = pairs_dictionary.get('110', 0)
     c7 = pairs_dictionary.get('111', 0)
 
-    state = State(c0, c1, c2, c3, c4, c5, c6, c7)
+    state = ThreeQubitState(c0, c1, c2, c3, c4, c5, c6, c7)
     slocc_class = state.get_state_class()
     if slocc_class == EqClass.GHZ or slocc_class == EqClass.W:
         return EntanglementStatus.ENTANGLED

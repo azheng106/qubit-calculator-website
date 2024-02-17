@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class State:
+class ThreeQubitState:
     # c0 * |000> + c1 * |001> + ... + c7 * |111>
     def __init__(self, c0, c1, c2, c3, c4, c5, c6, c7):
         self.c0 = c0
