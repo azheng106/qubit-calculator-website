@@ -60,7 +60,7 @@ def calculate_entanglement():
                              for key, value in pairs.items()}
 
         # Fix approximation errors with Python sqrt
-        tolerance = 1e-10
+        tolerance = 1e-8
         keys = list(qubit_value_pairs.keys())
         values = list(qubit_value_pairs.values())
         for i in range(len(qubit_value_pairs) - 1):
