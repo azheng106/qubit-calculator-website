@@ -79,7 +79,7 @@ def infix_to_postfix(infix) -> list:
     for i in range(len(tokens) - 1):  # If user inputs '3i', make sure postfix evaluator knows to multiply 3 and i
         curr_token = tokens[i]
         next_token = tokens[i + 1]
-        if is_float(curr_token) and next_token in ['i', 'j', 'pi']:  # ['2', 'i'] => ['2', '*', 'i']
+        if is_float(curr_token) and next_token in ['i', 'j', 'pi', 'sqrt', 'sin', 'cos', 'tan']:  # ['2', 'i'] => ['2', '*', 'i']
             tokens.insert(i+1, '*')
 
     stack = []  # Operator stack
@@ -102,7 +102,8 @@ def infix_to_postfix(infix) -> list:
         elif token == '(':  # Same as "else" case
             stack.append(token)
         elif stack and stack_has_higher_precedence(stack, token):
-            queue.append(stack.pop())
+            while stack and stack_has_higher_precedence(stack, token):
+                queue.append(stack.pop())
             stack.append(token)
         else:
             stack.append(token)
