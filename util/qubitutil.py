@@ -1,5 +1,4 @@
 from enum import Enum
-from sympy import isprime
 
 from util.threequbitstate import ThreeQubitState, EqClass
 

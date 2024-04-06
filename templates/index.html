@@ -13,11 +13,14 @@
 </head>
 
 <div id="3qubitPage" class="content" style="display:block;"> <!-- HTML code for 3 qubit SLOCC classificiation page -->
-    <h1>3-Qubit-State SLOCC Classifier</h1>
+    <h1>3-Qubit-State SLOCC & SD Calculator</h1>
     <h2>This classifier partitions pure states of three qubits into six SLOCC classes: GHZ, W, A-BC, B-AC, C-AB, and A-B-C.</h2>
+    <h2>Also calculates the Schmidt decomposition (SD) of the three qubit state.</h2>
     <p>Enter the 8 complex numbers for your 3-qubit-state in the boxes below. <br>
-        Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
-        Trig functions use radians.<br>
+        Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br><br>
+        SD is of the following form: r<sub>0</sub>|000>+r<sub>1</sub>e<sup>ix</sup>|100> +r<sub>2</sub>|101>+r<sub>3</sub>|110>+r<sub>4</sub>|111><br>
+        Program will output [r<sub>0</sub>, r<sub>1</sub>e<sup>ix</sup>, r<sub>2</sub>, r<sub>3</sub>, r<sub>4</sub>] <br>
+        SD FORM IS NOT WORKING CORRECTLY YET<br><br>
         Feedback/Suggestions: azheng106@gmail.com <br><br>
         c<sub>0</sub> -> c<sub>7</sub> default to 0 if left blank
     </p>
@@ -58,7 +61,9 @@
     <button type="submit">Calculate</button>
     <button type="reset">Reset</button>
 </form>
-<div id="result"></div>
+    <div id="result"></div>
+    <div id="sd1result"></div>
+    <div id="sd2result"></div>
 </div>
 
 <script> <!-- Logic for returning the SLOCC class when user presses "submit" -->
@@ -85,27 +90,33 @@
             if (!response.ok) { // If response code != 200, throw response and go to .catch block below
                 throw response;
             }
-            return response.json()
+            return response.json();
         })
         .then(data => {
             document.getElementById('result').textContent = data.classification;
+            document.getElementById('sd1result').textContent = data.schmidt1;
+            document.getElementById('sd2result').textContent = data.schmidt2;
         })
-            .catch(() => { // Catch error, print message to website
-                document.getElementById('result').textContent = "Input error";
-            });
+            .catch((error) => {
+                error.json().then(errorMessage => {
+                    document.getElementById('result1').textContent = 'Error: ' + errorMessage.error;
+                });
+            })
     };
 </script>
 
 <script> <!-- Remove the previous results when the user presses "reset" -->
     document.getElementById('3qubitForm').onreset = function() {
         document.getElementById('result').textContent = '';
+        document.getElementById('sd1result').textContent = '';
+        document.getElementById('sd2result').textContent = '';
     }
 </script>
 
 <div id="nQubitPage" class="content"> <!-- HTML code for n-qubit Entanglement page -->
     <h1>n-Qubit-State Entanglement Detector</h1>
     <h2>Using a sufficient condition, the classifier can detect entangled states but not always separable states.
-        The outputs for the classifier are "entangled", "separable" or "unknown".  </h2>
+        The outputs for the classifier are "entangled", "separable", or "unknown".  </h2>
     <p> Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
         Trig functions use radians.<br>
         Feedback/Suggestions: azheng106@gmail.com <br> <br>
@@ -117,11 +128,9 @@
             <label for="nQubits"> Enter number of qubits (>=2): </label>
             <input type="number" id="nQubits" class="n-input" autocomplete = "off" placeholder="n>=2" min="2" required>
         </div>
-
         <p><br>
             C<sub>0</sub> is the coefficient of |0...00>, C<sub>1</sub> for |0...01>, etc
         </p>
-
         <div id="inputPairsContainer">
             <div class="input-pair">
                 <div class="input-labels">
@@ -134,15 +143,13 @@
                 </div>
             </div>
         </div>
-
         <button type="submit">Calculate</button>
         <button type="reset">Reset</button>
     </form>
     <div id="result1"></div>
-
 </div>
 
-<script> <!-- Add new line when the user fills in one line of constants. Made by ChatGPT -->
+<script> <!-- Add new line when the user fills in one line of constants. -->
     const container = document.getElementById('inputPairsContainer');
 
     container.addEventListener('input', function() { // Listen for user input
@@ -164,7 +171,6 @@
             }
         }
     });
-
     function addNewInputPair() {
         const newDiv = document.createElement('div');
         newDiv.classList.add('input-pair', 'removable-input-pair'); // Add removable class tag for identification when reset is clicked
@@ -176,7 +182,6 @@
         `;
         container.appendChild(newDiv);
     }
-
     function getQubitNumber() {
         const nQubitNumber = parseInt(document.getElementById('nQubits').value, 10);
 
@@ -250,7 +255,7 @@
     <button id="nQubitButton">n-Qubit Entanglement</button>
 </div>
 
-<script> <!-- Handle the buttons switching between the two web pages -->
+<script> <!-- Handle the buttons switching between the web pages -->
     document.getElementById('3qubitButton').onclick = function() {
         document.getElementById('3qubitPage').style.display = 'block';
         document.getElementById('nQubitPage').style.display = 'none';

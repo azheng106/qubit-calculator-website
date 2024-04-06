@@ -3,6 +3,8 @@ import re
 import cmath
 from enum import Enum
 
+import numpy as np
+
 
 class Precedence(Enum):
     # Higher values indicate higher precedence
@@ -79,8 +81,9 @@ def infix_to_postfix(infix) -> list:
     for i in range(len(tokens) - 1):  # If user inputs '3i', make sure postfix evaluator knows to multiply 3 and i
         curr_token = tokens[i]
         next_token = tokens[i + 1]
-        if is_float(curr_token) and next_token in ['i', 'j', 'pi', 'sqrt', 'sin', 'cos', 'tan']:  # ['2', 'i'] => ['2', '*', 'i']
-            tokens.insert(i+1, '*')
+        if is_float(curr_token) and next_token in ['i', 'j', 'pi', 'sqrt', 'sin', 'cos',
+                                                   'tan']:  # ['2', 'i'] => ['2', '*', 'i']
+            tokens.insert(i + 1, '*')
 
     stack = []  # Operator stack
     queue = []  # Output queue
@@ -167,3 +170,36 @@ def eval_postfix(postfix) -> float:
 
 def evaluate(expression):
     return eval_postfix(infix_to_postfix(expression))
+
+
+def truncate(number, decimals=0):
+    if isinstance(number, complex):
+        if decimals == 0:
+            real_part = int(number.real)
+            imag_part = int(number.imag)
+        else:
+            factor = 10.0 ** decimals
+            real_part = int(number.real * factor) / factor
+            imag_part = int(number.imag * factor) / factor
+
+        # If the imaginary part is 0, return only the real part
+        if imag_part == 0:
+            return real_part
+        else:
+            return complex(real_part, imag_part)
+    else:
+        if decimals == 0:
+            return int(number)
+        factor = 10.0 ** decimals
+        return int(number * factor) / factor
+
+
+def apply_tolerance(value, tolerance=1e-8):
+    """
+    Fix approximation errors where a number is not recognized as 0 because it is e-18 or something.
+    Works for both matrices and numbers
+    """
+    if isinstance(value, np.ndarray):
+        return np.where(np.abs(value) < tolerance, 0, value)
+    else:
+        return 0 if np.abs(value) < tolerance else value

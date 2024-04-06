@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, render_template
 
-from util.evalutil import evaluate
+from util.evalutil import evaluate, truncate
 from util.qubitutil import *
+
+from sympy import symbols, I, Matrix, solve
 
 app = Flask(__name__)
 
@@ -31,11 +33,25 @@ def calculate_slocc():
         c6 = evaluate(data['c6'])
         c7 = evaluate(data['c7'])
 
+        # Find SLOCC class
         state = ThreeQubitState(c0, c1, c2, c3, c4, c5, c6, c7)
-
         classification = state.get_state_class().value
 
-        return jsonify({'classification': 'Belongs to ' + classification + ' SLOCC class'})
+        # Calculate Schmidt Decomposition
+        schmidt_decomps = state.get_schmidt_decomposition()
+        schmidt_decomps = [[truncate(num, 4) for num in inner_list] for inner_list in schmidt_decomps]
+
+        sd1 = ''
+        sd2 = ''
+        if len(schmidt_decomps) == 1:
+            sd1 = f'SD: {schmidt_decomps[0]}'
+        elif len(schmidt_decomps) == 2:
+            sd1 = f'SD 1: {schmidt_decomps[0]}'
+            sd2 = f'SD 2: {schmidt_decomps[1]}'
+
+        return jsonify({'classification': 'Belongs to ' + classification + ' SLOCC class',
+                        'schmidt1': sd1,
+                        'schmidt2': sd2})
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # Error code 400
 
@@ -64,8 +80,8 @@ def calculate_entanglement():
         keys = list(qubit_value_pairs.keys())
         values = list(qubit_value_pairs.values())
         for i in range(len(qubit_value_pairs) - 1):
-            if abs(values[i] - values[i+1]) < tolerance:  # If values are close enough, then set equal to each other
-                values[i+1] = values[i]
+            if abs(values[i] - values[i + 1]) < tolerance:  # If values are close enough, then set equal to each other
+                values[i + 1] = values[i]
         qubit_value_pairs = dict(zip(keys, values))  # Recreate the dictionary with new values
 
         classification = is_entangled(qubit_value_pairs, int(num_qubits))
