@@ -82,15 +82,20 @@ class ThreeQubitState:
             U_C = None
             C_0_prime = None
             L_0A = apply_tolerance(UA[0, 0] * C_0 + UA[0, 1] * C_1)
+            if np.linalg.det(L_0A) != 0:
+                raise Exception('L_0A determinant != 0')
+
             if np.all(L_0A == 0):  # Case 1
+                print("1")
                 U_B = identity
                 U_C = identity
                 C_0_prime = np.array([[0, 0], [0, 0]])
             elif np.count_nonzero(L_0A) == 1:  # Case 2
+                print("2")
                 nonzero_loc = np.transpose(np.nonzero(L_0A))
                 row_ind, col_ind = nonzero_loc[0]
                 r_exp_i_phi = L_0A[row_ind, col_ind]
-                r = np.abs(r_exp_i_phi)
+                r = abs(r_exp_i_phi)
                 exp_i_phi = r_exp_i_phi / r
                 U = np.array([[exp_i_phi ** -1, 0], [0, exp_i_phi]])
                 U_prime = np.array([[0, exp_i_phi ** -1], [exp_i_phi, 0]])
@@ -100,6 +105,7 @@ class ThreeQubitState:
                     U_C = identity
                     C_0_prime = sigma
                 elif tuple(nonzero_loc[0]) == (0, 1):
+                    print("2.2")
                     U_B = U
                     U_C = pauliX
                     C_0_prime = sigma
@@ -112,6 +118,7 @@ class ThreeQubitState:
                     U_C = pauliX
                     C_0_prime = sigma
             elif np.count_nonzero(L_0A) == 2:  # Case 3
+                print("3")
                 pos1, pos2 = np.transpose(np.nonzero(L_0A))
                 a = L_0A[pos1[0], pos1[1]]
                 b = L_0A[pos2[0], pos2[1]]
@@ -136,6 +143,7 @@ class ThreeQubitState:
                     U_C = pauliX
                     C_0_prime = D
             elif np.count_nonzero(L_0A) == 4:  # Case 4
+                print("4")
                 a = L_0A[0, 0]
                 b = L_0A[0, 1]
                 ka = L_0A[1, 0]
@@ -162,16 +170,12 @@ class ThreeQubitState:
             sd_form = [C_0_prime[0, 0], C_1_prime[0, 0], C_1_prime[0, 1], C_1_prime[1, 0],
                        C_1_prime[1, 1]]  # Coefficients for |000>, |100>, |101>, |110>, |111>, Eq. 18
 
-            print(sd_form)
             # 1.2
             phases = [cmath.phase(sd_form[i]) for i in range(1, 5)]
-            lambda1 = np.abs(sd_form[1])
-            if lambda1 != 0:
-                phi = phases[0] - phases[1] - phases[2] + phases[3]
-                sd_form = [np.abs(sd_form[i]) for i in range(0, 5)]
-                sd_form[1] *= cmath.exp(1j * phi)  # Multiply |100> coeff by e^(i*phi)
-            else:
-                sd_form = [np.abs(sd_form[i]) for i in range(0, 5)]
+
+            phi = phases[0] - phases[1] - phases[2] + phases[3]
+            sd_form = [abs(sd_form[i]) for i in range(0, 5)]
+            sd_form[1] *= cmath.exp(1j * phi)  # Multiply |100> coeff by e^(i*phi)
 
             schmidt_decompositions.append(sd_form)
         if len(schmidt_decompositions) == 2 and schmidt_decompositions[0] == schmidt_decompositions[1]:  # Remove duplicate if both SDs are equal
