@@ -86,12 +86,10 @@ class ThreeQubitState:
                 raise Exception('L_0A determinant != 0')
 
             if np.all(L_0A == 0):  # Case 1
-                print("1")
                 U_B = identity
                 U_C = identity
                 C_0_prime = np.array([[0, 0], [0, 0]])
             elif np.count_nonzero(L_0A) == 1:  # Case 2
-                print("2")
                 nonzero_loc = np.transpose(np.nonzero(L_0A))
                 row_ind, col_ind = nonzero_loc[0]
                 r_exp_i_phi = L_0A[row_ind, col_ind]
@@ -105,7 +103,6 @@ class ThreeQubitState:
                     U_C = identity
                     C_0_prime = sigma
                 elif tuple(nonzero_loc[0]) == (0, 1):
-                    print("2.2")
                     U_B = U
                     U_C = pauliX
                     C_0_prime = sigma
@@ -118,7 +115,6 @@ class ThreeQubitState:
                     U_C = pauliX
                     C_0_prime = sigma
             elif np.count_nonzero(L_0A) == 2:  # Case 3
-                print("3")
                 pos1, pos2 = np.transpose(np.nonzero(L_0A))
                 a = L_0A[pos1[0], pos1[1]]
                 b = L_0A[pos2[0], pos2[1]]
@@ -143,7 +139,6 @@ class ThreeQubitState:
                     U_C = pauliX
                     C_0_prime = D
             elif np.count_nonzero(L_0A) == 4:  # Case 4
-                print("4")
                 a = L_0A[0, 0]
                 b = L_0A[0, 1]
                 ka = L_0A[1, 0]
