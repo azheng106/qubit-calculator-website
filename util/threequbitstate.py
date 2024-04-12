@@ -59,7 +59,7 @@ class ThreeQubitState:
         else:
             return EqClass.GHZ
 
-    def get_schmidt_decomposition(self):
+    def get_schmidt_decomposition(self) -> list:
         alpha = apply_tolerance(self.c0 * self.c3 - self.c1 * self.c2)
         beta = apply_tolerance(self.c0 * self.c7 - self.c1 * self.c6 - self.c2 * self.c5 + self.c3 * self.c4)
         gamma = apply_tolerance(self.c4 * self.c7 - self.c5 * self.c6)

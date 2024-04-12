@@ -29,9 +29,9 @@ def calculate_UA(alpha, beta, gamma, tau) -> list:
         U_A.append(pauliX)
         print("Case 5")
     elif alpha != 0 and gamma == 0 and beta != 0:  # GHZ
-        delta = abs(beta) / cmath.sqrt(beta ** 2 + abs(alpha) ** 2)
+        delta = abs(beta) / cmath.sqrt(abs(beta) ** 2 + abs(alpha) ** 2)
         U_A.append(pauliX)
-        U_A.append(np.array([[delta, -alpha * delta / beta], [-np.conj(alpha) * delta / np.conj(beta), delta]]))
+        U_A.append(np.array([[delta, -alpha * delta / beta], [np.conj(alpha) * delta / np.conj(beta), delta]]))
         print("Case 6")
     elif alpha != 0 and gamma != 0:
         if beta == 0:  # GHZ
