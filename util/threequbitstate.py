@@ -63,7 +63,7 @@ class ThreeQubitState:
         alpha = apply_tolerance(self.c0 * self.c3 - self.c1 * self.c2)
         beta = apply_tolerance(self.c0 * self.c7 - self.c1 * self.c6 - self.c2 * self.c5 + self.c3 * self.c4)
         gamma = apply_tolerance(self.c4 * self.c7 - self.c5 * self.c6)
-        tau = apply_tolerance(self.get_3tangle() / 4)
+        tau = apply_tolerance(beta ** 2 - 4 * alpha * gamma)
 
         C_0 = np.array([[self.c0, self.c1], [self.c2, self.c3]])
         C_1 = np.array([[self.c4, self.c5], [self.c6, self.c7]])

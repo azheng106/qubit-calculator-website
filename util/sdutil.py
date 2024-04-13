@@ -36,10 +36,10 @@ def calculate_UA(alpha, beta, gamma, tau) -> list:
             t = -beta / (2 * alpha)
             U_A.append(big_T_array(t))
         elif beta != 0 and tau != 0:  # GHZ
-            t = (-beta - cmath.sqrt(tau)) / (2 * alpha)
-            U_A.append(big_T_array(t))
-            t = (-beta + cmath.sqrt(tau)) / (2 * alpha)
-            U_A.append(big_T_array(t))
+            t_plus = (-beta + cmath.sqrt(tau)) / (2 * alpha)
+            t_minus = (-beta - cmath.sqrt(tau)) / (2 * alpha)
+            U_A.append(big_T_array(t_plus))
+            U_A.append(big_T_array(t_minus))
     return U_A
 
 
