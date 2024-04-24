@@ -3,7 +3,7 @@ from enum import Enum
 
 import numpy as np
 
-from util.evalutil import apply_tolerance
+from util.evalutil import apply_tolerance, truncate
 from util.sdutil import calculate_UA, identity, pauliX, pauliZ
 
 
@@ -167,14 +167,28 @@ class ThreeQubitState:
 
             # 1.2
             phases = [cmath.phase(sd_form[i]) for i in range(1, 5)]
-
             phi = phases[0] - phases[1] - phases[2] + phases[3]
             sd_form = [abs(sd_form[i]) for i in range(0, 5)]
             sd_form[1] *= cmath.exp(1j * phi)  # Multiply |100> coeff by e^(i*phi)
 
             schmidt_decompositions.append(sd_form)
+
         if len(schmidt_decompositions) == 2 and schmidt_decompositions[0] == schmidt_decompositions[1]:  # Remove duplicate if both SDs are equal
             schmidt_decompositions.pop()
+        
+        schmidt_decompositions = [[truncate(num, 4) for num in inner_list] for inner_list in schmidt_decompositions]  # Truncate trailing decimals
+
+        """
+        Convert 2nd term in SD from rectangular (a+bi) to polar (r*e^{ix}) form
+        Create an HTML string so website can display e^{ix} with proper superscript notation for exponent
+        """
+        for i in range(len(schmidt_decompositions)):
+            sd = schmidt_decompositions[i]
+            r, phi = cmath.polar(sd[1])
+            r, phi = truncate(r, 3), truncate(phi, 3)  # Truncate trailing decimals
+            if phi == 0:  # So program displays r instead of r * e^(i*0.0)
+                continue
+            schmidt_decompositions[i] = f'[{sd[0]}, {r}e<sup>{phi}i</sup>, {sd[2]}, {sd[3]}, {sd[4]}]'
         return schmidt_decompositions
 
 

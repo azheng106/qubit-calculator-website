@@ -80,7 +80,6 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     :param pairs_dictionary: State to check
     :param n: Number of qubits in the state
     """
-
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
 

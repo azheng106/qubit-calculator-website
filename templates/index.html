@@ -93,8 +93,8 @@
         })
         .then(data => {
             document.getElementById('result').textContent = data.classification;
-            document.getElementById('sd1result').textContent = data.schmidt1;
-            document.getElementById('sd2result').textContent = data.schmidt2;
+            document.getElementById('sd1result').innerHTML = data.schmidt1;
+            document.getElementById('sd2result').innerHTML = data.schmidt2;
         })
             .catch((error) => {
                 error.json().then(errorMessage => {

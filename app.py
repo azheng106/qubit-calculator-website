@@ -39,7 +39,6 @@ def calculate_slocc():
 
         # Calculate Schmidt Decomposition
         schmidt_decomps = state.get_schmidt_decomposition()
-        schmidt_decomps = [[truncate(num, 4) for num in inner_list] for inner_list in schmidt_decomps]
 
         sd1 = ''
         sd2 = ''
