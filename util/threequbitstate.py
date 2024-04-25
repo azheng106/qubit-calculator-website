@@ -3,7 +3,7 @@ from enum import Enum
 
 import numpy as np
 
-from util.evalutil import apply_tolerance, truncate
+from util.evalutil import apply_tolerance, truncate, lists_are_equal
 from util.sdutil import calculate_UA, identity, pauliX, pauliZ
 
 
@@ -173,7 +173,7 @@ class ThreeQubitState:
 
             schmidt_decompositions.append(sd_form)
 
-        if len(schmidt_decompositions) == 2 and schmidt_decompositions[0] == schmidt_decompositions[1]:  # Remove duplicate if both SDs are equal
+        if len(schmidt_decompositions) == 2 and lists_are_equal(schmidt_decompositions[0], schmidt_decompositions[1]):  # Remove duplicate if both SDs are equal
             schmidt_decompositions.pop()
         
         schmidt_decompositions = [[truncate(num, 4) for num in inner_list] for inner_list in schmidt_decompositions]  # Truncate trailing decimals

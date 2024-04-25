@@ -205,3 +205,15 @@ def apply_tolerance(value, tolerance=1e-8):
         return np.where(np.abs(value) < tolerance, 0, value)
     else:
         return 0 if np.abs(value) < tolerance else value
+
+
+def lists_are_equal(l1, l2, tolerance=1e-8) -> bool:
+    """
+    Compare if two lists are equal while accounting for Python approximation errors
+    """
+    if len(l1) != len(l2):
+        return False
+    for val1, val2 in zip(l1, l2):
+        if abs(val1 - val2) > tolerance:
+            return False
+    return True
