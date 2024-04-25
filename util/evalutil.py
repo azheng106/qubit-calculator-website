@@ -68,7 +68,7 @@ def infix_to_postfix(infix) -> list:
     :return: Postfix
     """
     infix = infix.replace(' ', '')  # Remove spaces
-    tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan|pi',
+    tokens = re.findall(r'[\d.]+|[+\-*/()^]|sqrt|i|j|sin|cos|tan|pi|e',
                         infix)  # infix = '1+1' => tokens = ['1', '+', '1']
 
     reconstructed = ''.join(tokens)
@@ -82,14 +82,14 @@ def infix_to_postfix(infix) -> list:
         curr_token = tokens[i]
         next_token = tokens[i + 1]
         if is_float(curr_token) and next_token in ['i', 'j', 'pi', 'sqrt', 'sin', 'cos',
-                                                   'tan']:  # ['2', 'i'] => ['2', '*', 'i']
+                                                   'tan', 'e']:  # ['2', 'i'] => ['2', '*', 'i']
             tokens.insert(i + 1, '*')
 
     stack = []  # Operator stack
     queue = []  # Output queue
 
     for index, token in enumerate(tokens):
-        if is_float(token) or token in ['i', 'j', 'pi']:  # Numbers are automatically pushed into queue
+        if is_float(token) or token in ['i', 'j', 'pi', 'e']:  # Numbers are automatically pushed into queue
             queue.append(token)
         elif token == '-':
             if is_negative_sign(tokens, index):  # Treat negative sign differently
@@ -130,6 +130,8 @@ def eval_postfix(postfix) -> float:
             stack.append(complex(0.0, 1.0))
         elif token == 'pi':
             stack.append(math.pi)
+        elif token == 'e':
+            stack.append(cmath.exp(1))
         elif token == 'unary_minus':
             if len(stack) < 1:
                 raise ValueError('Invalid expression')

@@ -1,9 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 
-from util.evalutil import evaluate, truncate
+from util.evalutil import evaluate
 from util.qubitutil import *
-
-from sympy import symbols, I, Matrix, solve
 
 app = Flask(__name__)
 
