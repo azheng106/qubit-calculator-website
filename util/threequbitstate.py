@@ -82,8 +82,6 @@ class ThreeQubitState:
             U_C = None
             C_0_prime = None
             L_0A = apply_tolerance(UA[0, 0] * C_0 + UA[0, 1] * C_1)
-            if np.linalg.det(L_0A) != 0:
-                raise Exception('L_0A determinant != 0')
 
             if np.all(L_0A == 0):  # Case 1
                 U_B = identity
