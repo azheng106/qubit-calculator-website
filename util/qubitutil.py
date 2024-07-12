@@ -1,4 +1,8 @@
+import itertools
 from enum import Enum
+
+from sympy import isprime
+import numpy as np
 
 from util.threequbitstate import ThreeQubitState, EqClass
 
@@ -71,15 +75,13 @@ def is_entangled_3qubit(pairs_dictionary) -> Enum:
         return EntanglementStatus.SEPARABLE
 
 
-cached_results = {}  # Use memoization to drastically reduce run-time of is_entangled() function. Before this, it took 5+ mins for 12-qubit state. Now it takes a few seconds for 31 qubits!
-
-
 def is_entangled(pairs_dictionary, n) -> Enum:
     """
-    Check if an n-qubit state is entangled, unknown, or separable. A state is entangled if two of its children (with one qubit removed) are entangled
+    Check if an n-qubit state is entangled, or separable
     :param pairs_dictionary: State to check
     :param n: Number of qubits in the state
     """
+    print(coeff_matrix(pairs_dictionary, n))
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
 
@@ -89,27 +91,30 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     if len(pairs_dictionary) == 1:
         return EntanglementStatus.SEPARABLE
 
-    if dict_to_hashable(pairs_dictionary) in cached_results:  # If result has previously been calculated, use cached result instead of calculating it again.
-        return cached_results.get(dict_to_hashable(pairs_dictionary))
+    if len(pairs_dictionary) == 4:  # Section 3, m = 4 and n >= 2
+        values = list(pairs_dictionary.values())
+        for i in range(0, 4):
+            for j in range(i+1, 4):
+                if i != j and values[i] + values[j] == 1:
+                    unchecked_values = [values[k] for k in range(4) if k != i and k != j]
+                    if sum(unchecked_values) == 1 and values[i] * values[j] == unchecked_values[0] * unchecked_values[1]:
+                        return EntanglementStatus.SEPARABLE
 
     basic_states = list(pairs_dictionary.keys())
-    for i in range(len(basic_states[0])):
+    for i in range(len(basic_states[0])):  # if state has |0> or |1> that can be factored out
         if all(basic_state[i] == '0' for basic_state in basic_states) or \
                 all(basic_state[i] == '1' for basic_state in basic_states):
-            cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.SEPARABLE
             return EntanglementStatus.SEPARABLE
 
-    entangled_count = 0
-    for i in range(n):
-        qubit_i_removed = remove_qubit_n(i, pairs_dictionary)
-        if is_entangled(qubit_i_removed, n - 1) == EntanglementStatus.ENTANGLED:
-            entangled_count += 1
-        if entangled_count >= 2:
-            cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.ENTANGLED
-            return EntanglementStatus.ENTANGLED
+    if isprime(len(basic_states)):  # m (# non-zero coefficients) is prime
+        return EntanglementStatus.ENTANGLED
+    else:
+        basis_matrix = make_basis_matrix(pairs_dictionary)
 
-    cached_results[dict_to_hashable(pairs_dictionary)] = EntanglementStatus.UNKNOWN
-    return EntanglementStatus.UNKNOWN
+        if check_canonical_form(basis_matrix) and check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n)):
+            return EntanglementStatus.SEPARABLE
+
+    return EntanglementStatus.ENTANGLED
 
 
 def dict_to_hashable(dictionary):
@@ -117,3 +122,97 @@ def dict_to_hashable(dictionary):
     Convert a dictionary to a hashable type (tuple) so it can be used as a key in a dictionary
     """
     return tuple(dictionary.items())
+
+
+def make_basis_matrix(pairs_dictionary) -> np.array:
+    """
+    Create basis matrix B, where each row of the matrix is a basic state
+    """
+    keys = list(pairs_dictionary.keys())
+    matrix = np.array([list(map(int, key)) for key in keys])
+    return matrix
+
+
+def check_canonical_form(basis_matrix) -> bool:
+    """
+    Check if a basis matrix (matrix of basis states) can has a permutation that can be converted into canonical form
+    """
+    for perm in itertools.permutations(range(basis_matrix.shape[1])):
+        permuted_matrix = basis_matrix[:, perm]
+        for row_perm in itertools.permutations(range(basis_matrix.shape[0])):
+            permuted_matrix = permuted_matrix[list(row_perm), :]
+            if is_canonical(permuted_matrix):
+                return True
+    return False
+
+
+def is_canonical(matrix) -> bool:
+    """
+    Check if a matrix can be converted into a canonical form (PI1 delta
+                                                              PI2 delta)
+    """
+    rows, cols = matrix.shape
+    # Transpose the matrix to work with columns as if they are rows
+    matrix = matrix.T
+    unique_rows = {tuple(row) for row in matrix}
+
+    if len(unique_rows) != rows:
+        return False
+
+    for row in unique_rows:
+        sub_matrix = matrix[np.all(matrix == row, axis=1)]
+        if not all(np.array_equal(sub_matrix[0], r) for r in sub_matrix):
+            return False
+    return True
+
+
+def are_proportional(vec1, vec2):
+    """
+    Check if two vectors are proportional
+    """
+    ratio = None
+    for i in range(len(vec1)):
+        if vec1[i] == 0 and vec2[i] == 0:
+            continue
+        if vec1[i] == 0 or vec2[i] == 0:
+            return False
+        if ratio is None:
+            ratio = vec1[i] / vec2[i]
+        elif vec1[i] / vec2[i] != ratio:
+            return False
+    return True
+
+
+def check_proportional_rows_and_columns(coeff_matrix):
+    """
+    Check if coefficient matrix has proportional rows and columns. Appendix A of notes
+    """
+    rows, cols = coeff_matrix.shape
+
+    # Check rows for proportionality
+    for i in range(rows):
+        for j in range(i + 1, rows):
+            if not are_proportional(coeff_matrix[i, :], coeff_matrix[j, :]):
+                return False
+    return True
+
+
+def coeff_matrix(pairs_dictionary, num_qubits):
+    """
+    Generate the coefficient matrix from a pairs dictionary. Appendix A of notes
+    """
+    # Generate all possible basic states for the given number of qubits
+    basic_states = [bin(i)[2:].zfill(num_qubits) for i in range(2 ** num_qubits)]
+
+    # Extract coefficients for each state, assume 0 if not present in the dictionary
+    coefficients = [pairs_dictionary.get(key, 0) for key in basic_states]
+
+    # Determine the dimensions of the matrix
+    dim = int(np.sqrt(len(coefficients)))
+
+    # Reshape the coefficients into a matrix
+    matrix = np.array(coefficients).reshape(dim, dim)
+
+    return matrix
+
+print(check_canonical_form(np.array([[0, 0, 0], [0, 1, 1], [1, 0, 0], [1, 1, 1]])))

@@ -79,7 +79,7 @@ def calculate_entanglement():
         for i in range(len(qubit_value_pairs) - 1):
             if abs(values[i] - values[i + 1]) < tolerance:  # If values are close enough, then set equal to each other
                 values[i + 1] = values[i]
-        qubit_value_pairs = dict(zip(keys, values))  # Recreate the dictionary with new values
+        qubit_value_pairs = dict(zip(keys, values))  # Recreate the dictionary with new values. K: basic state, V: value
 
         classification = is_entangled(qubit_value_pairs, int(num_qubits))
 
