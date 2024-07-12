@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 
-from evalutil import evaluate
-from qubitutil import *
+from util.evalutil import evaluate
+from util.qubitutil import *
 
 app = Flask(__name__)
 
