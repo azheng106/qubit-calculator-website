@@ -3,8 +3,8 @@ from enum import Enum
 
 import numpy as np
 
-from util.evalutil import apply_tolerance, truncate, lists_are_equal
-from util.sdutil import calculate_UA, identity, pauliX, pauliZ
+from evalutil import apply_tolerance, truncate, lists_are_equal
+from sdutil import calculate_UA, identity, pauliX, pauliZ
 
 
 class ThreeQubitState:

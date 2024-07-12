@@ -4,7 +4,7 @@ from enum import Enum
 from sympy import isprime
 import numpy as np
 
-from util.threequbitstate import ThreeQubitState, EqClass
+from threequbitstate import ThreeQubitState, EqClass
 
 
 class EntanglementStatus(Enum):
