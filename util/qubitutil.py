@@ -81,7 +81,6 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     :param pairs_dictionary: State to check
     :param n: Number of qubits in the state
     """
-    print(coeff_matrix(pairs_dictionary, n))
     if n == 2:
         return is_entangled_2qubit(pairs_dictionary)
 
@@ -110,8 +109,11 @@ def is_entangled(pairs_dictionary, n) -> Enum:
         return EntanglementStatus.ENTANGLED
     else:
         basis_matrix = make_basis_matrix(pairs_dictionary)
+        print(f"canonical:  {check_canonical_form(basis_matrix)}")
+        print(f"prop: {check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n))}")
 
         if check_canonical_form(basis_matrix) and check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n)):
+            print("canonical + proportional")
             return EntanglementStatus.SEPARABLE
 
     return EntanglementStatus.ENTANGLED
@@ -135,7 +137,7 @@ def make_basis_matrix(pairs_dictionary) -> np.array:
 
 def check_canonical_form(basis_matrix) -> bool:
     """
-    Check if a basis matrix (matrix of basis states) can has a permutation that can be converted into canonical form
+    Check if a basis matrix (matrix of basis states) has a permutation that can be converted into canonical form
     """
     for perm in itertools.permutations(range(basis_matrix.shape[1])):
         permuted_matrix = basis_matrix[:, perm]
@@ -146,24 +148,27 @@ def check_canonical_form(basis_matrix) -> bool:
     return False
 
 
-def is_canonical(matrix) -> bool:
-    """
-    Check if a matrix can be converted into a canonical form (PI1 delta
-                                                              PI2 delta)
-    """
-    rows, cols = matrix.shape
-    # Transpose the matrix to work with columns as if they are rows
-    matrix = matrix.T
-    unique_rows = {tuple(row) for row in matrix}
+def is_equal_rows(matrix):
+    """Check if all rows in the matrix are equal."""
+    return np.all(np.all(matrix == matrix[0, :], axis=0))
 
-    if len(unique_rows) != rows:
-        return False
 
-    for row in unique_rows:
-        sub_matrix = matrix[np.all(matrix == row, axis=1)]
-        if not all(np.array_equal(sub_matrix[0], r) for r in sub_matrix):
-            return False
-    return True
+def is_canonical(matrix):
+    """Check if the matrix is in canonical form."""
+    n = matrix.shape[0] // 2
+
+    # Split the matrix into four blocks
+    for i in range(2):
+        Pi1 = matrix[:n, :n-1]
+        Pi2 = matrix[n:, :n-i]
+        Delta1 = matrix[:n, n-i:]
+        Delta2 = matrix[n:, n-i:]
+
+        # Check if Pi1 and Pi2 have equal rows
+        if is_equal_rows(Pi1) and is_equal_rows(Pi2) and np.array_equal(Delta1, Delta2):
+            return True
+
+    return False
 
 
 def are_proportional(vec1, vec2):
@@ -205,14 +210,21 @@ def coeff_matrix(pairs_dictionary, num_qubits):
     basic_states = [bin(i)[2:].zfill(num_qubits) for i in range(2 ** num_qubits)]
 
     # Extract coefficients for each state, assume 0 if not present in the dictionary
-    coefficients = [pairs_dictionary.get(key, 0) for key in basic_states]
+    coefficients = [pairs_dictionary.get(key) for key in basic_states if pairs_dictionary.get(key) is not None]
 
     # Determine the dimensions of the matrix
-    dim = int(np.sqrt(len(coefficients)))
-
-    # Reshape the coefficients into a matrix
-    matrix = np.array(coefficients).reshape(dim, dim)
+    n = len(coefficients)
+    if np.sqrt(n).is_integer():  # If n is a perfect square
+        dim = int(np.sqrt(n))
+        matrix = np.array(coefficients).reshape(dim, dim)
+    else:  # If n is not a perfect square, find the two closest factors
+        factors = [(i, n // i) for i in range(1, int(n**0.5) + 1) if n % i == 0]
+        dim = factors[-1]
+        matrix = np.array(coefficients).reshape(dim[0], dim[1])
 
     return matrix
 
-print(check_canonical_form(np.array([[0, 0, 0], [0, 1, 1], [1, 0, 0], [1, 1, 1]])))
+print(is_canonical(np.array([[0, 0, 0],
+                             [0, 1,1],
+                             [1,0,0],
+                             [1,1,1]])))
