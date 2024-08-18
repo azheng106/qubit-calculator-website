@@ -138,12 +138,6 @@ def check_canonical_form(basis_matrix) -> bool:
     return False
 
 
-"""
-for row_perm in itertools.permutations(range(basis_matrix.shape[0])):
-            permuted_matrix = permuted_matrix[list(row_perm), :]
-"""
-
-
 def is_equal_rows(matrix):
     """Check if all rows in the matrix are equal."""
     return np.all(np.all(matrix == matrix[0, :], axis=0))
@@ -165,9 +159,8 @@ def is_canonical(matrix):
         for i in range(2):  # Check each factorization in both orders, such as 2x3 and 3x2
             deltas = []
             num_pis = factorization[i]
-            for barrier_col in range(1, num_cols - 1):  # Define the left-right barrier between PIs and deltas
+            for barrier_col in range(1, num_cols):  # Define the left-right barrier between PIs and deltas
                 left_side = matrix[:, : barrier_col]
-
                 if not is_possible_to_canonical(left_side, num_pis, num_rows):
                     break
                 for row_perm in itertools.permutations(range(matrix.shape[0])):
