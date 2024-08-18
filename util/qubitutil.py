@@ -3,6 +3,7 @@ from enum import Enum
 
 from sympy import isprime
 import numpy as np
+import time
 
 from util.threequbitstate import ThreeQubitState, EqClass
 
@@ -109,21 +110,12 @@ def is_entangled(pairs_dictionary, n) -> Enum:
         return EntanglementStatus.ENTANGLED
     else:
         basis_matrix = make_basis_matrix(pairs_dictionary)
-        print(f"canonical:  {check_canonical_form(basis_matrix)}")
-        print(f"prop: {check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n))}")
 
         if check_canonical_form(basis_matrix) and check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n)):
             print("canonical + proportional")
             return EntanglementStatus.SEPARABLE
 
     return EntanglementStatus.ENTANGLED
-
-
-def dict_to_hashable(dictionary):
-    """
-    Convert a dictionary to a hashable type (tuple) so it can be used as a key in a dictionary
-    """
-    return tuple(dictionary.items())
 
 
 def make_basis_matrix(pairs_dictionary) -> np.array:
@@ -139,13 +131,17 @@ def check_canonical_form(basis_matrix) -> bool:
     """
     Check if a basis matrix (matrix of basis states) has a permutation that can be converted into canonical form
     """
-    for perm in itertools.permutations(range(basis_matrix.shape[1])):
+    for perm in itertools.permutations(range(basis_matrix.shape[1])):  # all permutations of columns
         permuted_matrix = basis_matrix[:, perm]
-        for row_perm in itertools.permutations(range(basis_matrix.shape[0])):
-            permuted_matrix = permuted_matrix[list(row_perm), :]
-            if is_canonical(permuted_matrix):
-                return True
+        if is_canonical(permuted_matrix):
+            return True
     return False
+
+
+"""
+for row_perm in itertools.permutations(range(basis_matrix.shape[0])):
+            permuted_matrix = permuted_matrix[list(row_perm), :]
+"""
 
 
 def is_equal_rows(matrix):
@@ -155,20 +151,56 @@ def is_equal_rows(matrix):
 
 def is_canonical(matrix):
     """Check if the matrix is in canonical form."""
-    n = matrix.shape[0] // 2
+    num_rows = matrix.shape[0]
+    num_cols = matrix.shape[1]
+    factorizations = []  # array of tuples
 
-    # Split the matrix into four blocks
-    for i in range(2):
-        Pi1 = matrix[:n, :n-1]
-        Pi2 = matrix[n:, :n-i]
-        Delta1 = matrix[:n, n-i:]
-        Delta2 = matrix[n:, n-i:]
+    # get all factorizations of num_rows
+    for i in range(2, num_rows // 2):
+        if num_rows % i == 0:
+            factorizations.append((i, num_rows // i))
 
-        # Check if Pi1 and Pi2 have equal rows
-        if is_equal_rows(Pi1) and is_equal_rows(Pi2) and np.array_equal(Delta1, Delta2):
-            return True
+    # Number of PIs and deltas in the canonical form is equal to the first number in the factorization
+    for factorization in factorizations:
+        for i in range(2):  # Check each factorization in both orders, such as 2x3 and 3x2
+            deltas = []
+            num_pis = factorization[i]
+            for barrier_col in range(1, num_cols - 1):  # Define the left-right barrier between PIs and deltas
+                left_side = matrix[:, : barrier_col]
 
-    return False
+                if not is_possible_to_canonical(left_side, num_pis, num_rows):
+                    break
+                for row_perm in itertools.permutations(range(matrix.shape[0])):
+                    matrix = matrix[list(row_perm), :]
+                    for pi_height in range(num_rows // num_pis, num_rows + 1, num_rows // num_pis):
+                        pi = matrix[pi_height - num_rows // num_pis: pi_height, : barrier_col]
+                        if not is_equal_rows(pi):
+                            return False
+                        delta = matrix[pi_height - num_rows // num_pis: pi_height, barrier_col:]
+                        deltas.append(delta)
+            # Check if every matrix in deltas is equal to each other
+            if not all(np.array_equal(deltas[0], delta) for delta in deltas):
+                return False
+
+    return True
+
+
+def is_possible_to_canonical(matrix, num_pis, m):
+    num_unique_rows = len(set(tuple(row) for row in matrix))
+    divisor = m // num_pis
+    row_count = {}
+    for row in matrix:
+        if tuple(row) in row_count:
+            row_count[tuple(row)] += 1
+        else:
+            row_count[tuple(row)] = 1
+
+    for row_tuple, count in row_count.items():
+        if count % divisor != 0:
+            return False
+    if len(row_count.keys()) > num_pis:
+        return False
+    return True
 
 
 def are_proportional(vec1, vec2):
@@ -224,7 +256,9 @@ def coeff_matrix(pairs_dictionary, num_qubits):
 
     return matrix
 
-print(is_canonical(np.array([[0, 0, 0],
-                             [0, 1,1],
-                             [1,0,0],
-                             [1,1,1]])))
+
+def dict_to_hashable(dictionary):
+    """
+    Convert a dictionary to a hashable type (tuple) so it can be used as a key in a dictionary
+    """
+    return tuple(dictionary.items())
