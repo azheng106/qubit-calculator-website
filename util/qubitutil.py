@@ -91,6 +91,15 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     if len(pairs_dictionary) == 1:
         return EntanglementStatus.SEPARABLE
 
+    basic_states = list(pairs_dictionary.keys())
+    for i in range(len(basic_states[0])):  # if state has |0> or |1> that can be factored out
+        if all(basic_state[i] == '0' for basic_state in basic_states) or \
+                all(basic_state[i] == '1' for basic_state in basic_states):
+            return EntanglementStatus.SEPARABLE
+
+    if isprime(len(basic_states)):  # m (# non-zero coefficients) is prime
+        return EntanglementStatus.ENTANGLED
+
     if len(pairs_dictionary) == 4:  # Section 3, m = 4 and n >= 2
         values = list(pairs_dictionary.values())
         for i in range(0, 4):
@@ -100,20 +109,10 @@ def is_entangled(pairs_dictionary, n) -> Enum:
                     if sum(unchecked_values) == 1 and values[i] * values[j] == unchecked_values[0] * unchecked_values[1]:
                         return EntanglementStatus.SEPARABLE
 
-    basic_states = list(pairs_dictionary.keys())
-    for i in range(len(basic_states[0])):  # if state has |0> or |1> that can be factored out
-        if all(basic_state[i] == '0' for basic_state in basic_states) or \
-                all(basic_state[i] == '1' for basic_state in basic_states):
-            return EntanglementStatus.SEPARABLE
-
-    if isprime(len(basic_states)):  # m (# non-zero coefficients) is prime
-        return EntanglementStatus.ENTANGLED
-    else:
-        basis_matrix = make_basis_matrix(pairs_dictionary)
-
-        if check_canonical_form(basis_matrix) and check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n)):
-            print("canonical + proportional")
-            return EntanglementStatus.SEPARABLE
+    basis_matrix = make_basis_matrix(pairs_dictionary)
+    if check_canonical_form(basis_matrix) and \
+            check_proportional_rows_and_columns(coeff_matrix(pairs_dictionary, n)):
+        return EntanglementStatus.SEPARABLE
 
     return EntanglementStatus.ENTANGLED
 
@@ -144,7 +143,7 @@ def is_equal_rows(matrix):
 
 
 def is_canonical(matrix):
-    """Check if the matrix is in canonical form."""
+    """Check if the matrix can be written in canonical form (in any permutation of rows)."""
     num_rows = matrix.shape[0]
     num_cols = matrix.shape[1]
     factorizations = []  # array of tuples
@@ -155,14 +154,15 @@ def is_canonical(matrix):
             factorizations.append((i, num_rows // i))
 
     # Number of PIs and deltas in the canonical form is equal to the first number in the factorization
+    # e.g When checking 2x3, there are 2 PIs/deltas. When checking 3x2, there are 3 PIs/deltas
     for factorization in factorizations:
         for i in range(2):  # Check each factorization in both orders, such as 2x3 and 3x2
             deltas = []
             num_pis = factorization[i]
             for barrier_col in range(1, num_cols):  # Define the left-right barrier between PIs and deltas
                 left_side = matrix[:, : barrier_col]
-                if not is_possible_to_canonical(left_side, num_pis, num_rows):
-                    break
+                if not is_possible_to_canonical(left_side, num_pis):
+                    break  # Saves lots of needless row permutation calculations
                 for row_perm in itertools.permutations(range(matrix.shape[0])):
                     matrix = matrix[list(row_perm), :]
                     for pi_height in range(num_rows // num_pis, num_rows + 1, num_rows // num_pis):
@@ -178,8 +178,18 @@ def is_canonical(matrix):
     return True
 
 
-def is_possible_to_canonical(matrix, num_pis, m):
-    num_unique_rows = len(set(tuple(row) for row in matrix))
+def is_possible_to_canonical(matrix, num_pis):
+    """
+    Checks if it's possible for any row permutation of a matrix to be written in canonical form
+    It is impossible if
+        1. there are more unique rows than the number of pis
+        or
+        2. there is the incorrect number of each unique row for all rows of each pi to be equal
+    :param matrix: The part of basis matrix B that was moved to the left
+    :param num_pis: Number of sections that matrix must be split into, with all rows of each individual section equal
+    :return: Whether it is possible for any row permutation of matrix to be written in canonical form
+    """
+    m = matrix.shape[0]
     divisor = m // num_pis
     row_count = {}
     for row in matrix:
@@ -248,10 +258,3 @@ def coeff_matrix(pairs_dictionary, num_qubits):
         matrix = np.array(coefficients).reshape(dim[0], dim[1])
 
     return matrix
-
-
-def dict_to_hashable(dictionary):
-    """
-    Convert a dictionary to a hashable type (tuple) so it can be used as a key in a dictionary
-    """
-    return tuple(dictionary.items())
