@@ -91,11 +91,9 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     if len(pairs_dictionary) == 1:
         return EntanglementStatus.SEPARABLE
 
-    basic_states = list(pairs_dictionary.keys())
-    for i in range(len(basic_states[0])):  # if state has |0> or |1> that can be factored out
-        if all(basic_state[i] == '0' for basic_state in basic_states) or \
-                all(basic_state[i] == '1' for basic_state in basic_states):
-            return EntanglementStatus.SEPARABLE
+    basic_states: list[str] = list(pairs_dictionary.keys())
+    if can_be_factored(pairs_dictionary):
+        return EntanglementStatus.SEPARABLE
 
     if isprime(len(basic_states)):  # m (# non-zero coefficients) is prime
         return EntanglementStatus.ENTANGLED
@@ -117,7 +115,48 @@ def is_entangled(pairs_dictionary, n) -> Enum:
     return EntanglementStatus.ENTANGLED
 
 
-def make_basis_matrix(pairs_dictionary) -> np.array:
+def count_num_0(basic_states: list[str], index: int):
+    """
+    Returns how many 0s are at the index qubit
+    Ex. count_num_0(['00', '11', '01', '10'], 0) = 2
+    Ex. count_num_0(['00', '11', '10'], 0) = 1
+    """
+    count = 0
+    for state in basic_states:
+        if state[index] == '0':
+            count += 1
+    return count
+
+
+def can_be_factored(pairs_dict: dict[str, int]) -> bool:
+    basic_states = list(pairs_dict.keys())
+    num_qubits = len(basic_states[0])
+    num_states = len(basic_states)
+    check_num_0_count = True
+    for i in range(num_qubits):  # if state has |0> or |1> that can be factored out
+        if all(basic_state[i] == '0' for basic_state in basic_states) or \
+                all(basic_state[i] == '1' for basic_state in basic_states):
+            return True
+        else:  # Check if can factor in a different way, such as
+            # |000> + |001> + |100> + |101> = (|0> + |1>)(|00> + |11>)
+            if num_states % 2 != 0:
+                continue
+            coeffs = list(pairs_dict.values())
+            first_half = coeffs[: len(coeffs) // 2]
+            second_half = coeffs[len(coeffs) // 2:]
+            if first_half != second_half:
+                continue
+            if check_num_0_count and count_num_0(basic_states, i) == num_states / 2:
+                check_num_0_count = False
+            else:
+                remaining_qubits = set([state[i+1:] for state in basic_states])
+                num_unique = len(remaining_qubits)
+                if num_unique == num_states / 2:  # and check signs
+                    return True
+    return False
+
+
+def make_basis_matrix(pairs_dictionary: dict) -> np.array:
     """
     Create basis matrix B, where each row of the matrix is a basic state
     """
@@ -174,7 +213,6 @@ def is_canonical(matrix):
             # Check if every matrix in deltas is equal to each other
             if not all(np.array_equal(deltas[0], delta) for delta in deltas):
                 return False
-
     return True
 
 
