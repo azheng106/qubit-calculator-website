@@ -144,7 +144,7 @@ def can_be_factored(pairs_dict: dict[str, int]) -> bool:
             coeffs = list(pairs_dict.values())
             first_half = coeffs[: len(coeffs) // 2]
             second_half = coeffs[len(coeffs) // 2:]
-            if first_half != second_half:
+            if first_half != second_half and [n * -1 for n in first_half] != second_half:
                 continue
             if check_num_0_count and count_num_0(basic_states, i) == num_states / 2:
                 check_num_0_count = False
