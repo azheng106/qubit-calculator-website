@@ -3,7 +3,6 @@ from enum import Enum
 
 from sympy import isprime
 import numpy as np
-import time
 
 from util.threequbitstate import ThreeQubitState, EqClass
 
@@ -14,11 +13,10 @@ class EntanglementStatus(Enum):
     SEPARABLE = 'State is separable'
 
 
-def convert_to_basic_state(num_qubits, constant_number) -> str:
+def convert_to_basic_state(num_qubits: int, constant_number: int) -> str:
     """
     Convert a constant number to its basic state (binary) representation. Ex. C3 => |011>
     """
-    num_qubits = int(num_qubits)  # Convert string to int
     if constant_number > (2 ** num_qubits - 1):
         raise ValueError('Constant number >= 2^n')
     binary = bin(constant_number).replace('0b', '')
@@ -27,7 +25,7 @@ def convert_to_basic_state(num_qubits, constant_number) -> str:
     return binary
 
 
-def remove_qubit_n(n, pairs_dictionary) -> dict:
+def remove_qubit_n(n: int, pairs_dictionary: dict) -> dict:
     """
     Remove qubit n from given state
     :param n: Qubit number to remove
@@ -37,7 +35,7 @@ def remove_qubit_n(n, pairs_dictionary) -> dict:
     return {(key[:n] + key[n + 1:]): value for key, value in pairs_dictionary.items()}
 
 
-def is_entangled_2qubit(pairs_dictionary) -> Enum:
+def is_entangled_2qubit(pairs_dictionary: dict) -> Enum:
     """
     Check if a 2 qubit state is entangled or separable
     """
@@ -53,7 +51,7 @@ def is_entangled_2qubit(pairs_dictionary) -> Enum:
         return EntanglementStatus.SEPARABLE
 
 
-def is_entangled_3qubit(pairs_dictionary) -> Enum:
+def is_entangled_3qubit(pairs_dictionary: dict[str, int]) -> Enum:
     """
     Check if a 3 qubit state is entangled or separable
     """
@@ -76,7 +74,7 @@ def is_entangled_3qubit(pairs_dictionary) -> Enum:
         return EntanglementStatus.SEPARABLE
 
 
-def is_entangled(pairs_dictionary, n) -> Enum:
+def is_entangled(pairs_dictionary: dict[str, int], n: int) -> Enum:
     """
     Check if an n-qubit state is entangled, or separable
     :param pairs_dictionary: State to check
@@ -156,7 +154,7 @@ def can_be_factored(pairs_dict: dict[str, int]) -> bool:
     return False
 
 
-def make_basis_matrix(pairs_dictionary: dict) -> np.array:
+def make_basis_matrix(pairs_dictionary: dict[str, int]) -> np.array:
     """
     Create basis matrix B, where each row of the matrix is a basic state
     """
@@ -165,7 +163,7 @@ def make_basis_matrix(pairs_dictionary: dict) -> np.array:
     return matrix
 
 
-def check_canonical_form(basis_matrix) -> bool:
+def check_canonical_form(basis_matrix: np.array) -> bool:
     """
     Check if a basis matrix (matrix of basis states) has a permutation that can be converted into canonical form
     """
@@ -176,18 +174,18 @@ def check_canonical_form(basis_matrix) -> bool:
     return False
 
 
-def is_equal_rows(matrix):
+def is_equal_rows(matrix: np.array) -> bool:
     """Check if all rows in the matrix are equal."""
     return np.all(np.all(matrix == matrix[0, :], axis=0))
 
 
-def is_canonical(matrix):
+def is_canonical(matrix: np.array) -> bool:
     """Check if the matrix can be written in canonical form (in any permutation of rows)."""
     num_rows = matrix.shape[0]
     num_cols = matrix.shape[1]
     factorizations = []  # array of tuples
 
-    # get all factorizations of num_rows
+    # Get all factorizations of num_rows
     for i in range(2, num_rows // 2):
         if num_rows % i == 0:
             factorizations.append((i, num_rows // i))
@@ -216,7 +214,7 @@ def is_canonical(matrix):
     return True
 
 
-def is_possible_to_canonical(matrix, num_pis):
+def is_possible_to_canonical(matrix: np.array, num_pis: int) -> bool:
     """
     Checks if it's possible for any row permutation of a matrix to be written in canonical form
     It is impossible if
@@ -244,7 +242,7 @@ def is_possible_to_canonical(matrix, num_pis):
     return True
 
 
-def are_proportional(vec1, vec2):
+def are_proportional(vec1: list[int], vec2: list[int]) -> bool:
     """
     Check if two vectors are proportional
     """
@@ -261,7 +259,7 @@ def are_proportional(vec1, vec2):
     return True
 
 
-def check_proportional_rows_and_columns(coeff_matrix):
+def check_proportional_rows_and_columns(coeff_matrix: np.array) -> bool:
     """
     Check if coefficient matrix has proportional rows and columns. Appendix A of notes
     """
@@ -275,7 +273,7 @@ def check_proportional_rows_and_columns(coeff_matrix):
     return True
 
 
-def coeff_matrix(pairs_dictionary, num_qubits):
+def coeff_matrix(pairs_dictionary: dict[str, int], num_qubits: int) -> np.array:
     """
     Generate the coefficient matrix from a pairs dictionary. Appendix A of notes
     """

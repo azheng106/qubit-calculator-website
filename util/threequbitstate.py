@@ -9,7 +9,7 @@ from util.sdutil import calculate_UA, identity, pauliX, pauliZ
 
 class ThreeQubitState:
     # c0 * |000> + c1 * |001> + ... + c7 * |111>
-    def __init__(self, c0, c1, c2, c3, c4, c5, c6, c7):
+    def __init__(self, c0: int, c1: int, c2: int, c3: int, c4: int, c5: int, c6: int, c7: int):
         self.c0 = c0
         self.c1 = c1
         self.c2 = c2

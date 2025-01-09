@@ -31,7 +31,7 @@ precedences = {
 }
 
 
-def stack_has_higher_precedence(stack, current_token) -> bool:
+def stack_has_higher_precedence(stack: list, current_token) -> bool:
     """
     Return True if the operator on top of the stack has >= precedence than the current token, False otherwise
     """
@@ -60,7 +60,7 @@ def is_float(token) -> bool:
     return False
 
 
-def infix_to_postfix(infix) -> list:
+def infix_to_postfix(infix: str) -> list:
     """
     Use Shunting Yard Algorithm to translate mathematical infix to postfix
     https://www.youtube.com/watch?v=Wz85Hiwi5MY
