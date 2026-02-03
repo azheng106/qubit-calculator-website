@@ -12,10 +12,11 @@
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
 </head>
 
-<div id="3qubitPage" class="content" style="display:block;"> <!-- HTML code for 3 qubit SLOCC classificiation page -->
+<div id="3qubitPage" class="content"> <!-- HTML code for 3 qubit SLOCC classificiation page -->
     <h1>3-Qubit-State SLOCC & SD Calculator</h1>
     <h2>This classifier partitions pure states of three qubits into six SLOCC classes: GHZ, W, A-BC, B-AC, C-AB, and A-B-C.</h2>
-    <h2>Also calculates the Schmidt decomposition (SD) of the three qubit state.</h2>
+    <h2>Also calculates the Schmidt decomposition (SD) of the three qubit state. </h2>
+    <p>Reference for SD of three qubits: A. Acin et al., Phys. Rev. Lett. 85, 1560 (2000)</p> <br>
     <p>Enter the 8 complex numbers for your 3-qubit-state in the boxes below. <br>
         Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br><br>
         SD is of the following form: r<sub>0</sub>|000>+r<sub>1</sub>e<sup>ix</sup>|100> +r<sub>2</sub>|101>+r<sub>3</sub>|110>+r<sub>4</sub>|111><br>
@@ -112,7 +113,7 @@
     }
 </script>
 
-<div id="nQubitPage" class="content"> <!-- HTML code for n-qubit Entanglement page -->
+<div id="nQubitPage" class="content" style="display:block;"> <!-- HTML code for n-qubit Entanglement page -->
     <h1>n-Qubit-State Entanglement Detector</h1>
     <h2>Using a sufficient and necessary condition, this classifier can detect both entangled and separable states.  </h2>
     <p> Operations: + - * / ^ sqrt sin cos tan, "i" = <span>&#8730;</span>-1, "pi" = 3.1415...<br>
@@ -249,8 +250,8 @@
 
 <div class="switching-buttons"> <!-- Buttons to switch between the two web pages -->
     <p> Switch between our calculators!</p>
-    <button id="3qubitButton">3 Qubit SLOCC Classifier</button>
     <button id="nQubitButton">n-Qubit Entanglement</button>
+    <button id="3qubitButton">3 Qubit SLOCC Classifier</button>
 </div>
 
 <script> <!-- Handle the buttons switching between the web pages -->
